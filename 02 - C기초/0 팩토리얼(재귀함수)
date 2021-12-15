@@ -1,0 +1,22 @@
+#include<stdio.h>
+#include<string.h>
+
+int factorial(int a) {
+	int value = a;
+	if (a == 1) {
+		printf("fact(%d)함수 호출!\n", 1);
+		printf("fact(%d)값 %d반환\n", 1,1);
+		return 1;
+	}
+	else {
+		printf("fact(%d)함수 호출!\n", value);
+		a = a * factorial(a - 1);
+		printf("fact(%d)값 %d반환\n", value, a);
+		return a;
+	}
+}
+
+void main() {
+	int a=4;
+	printf("%d", factorial(a));
+}
