@@ -1,19 +1,20 @@
+<배운점>
+-연결리스트 스택장점
+1.저장공간이 유동적이다.
+
+------------------------------------------------------------------------------------------------------------
+
 #include<stdio.h>
 #include<stdlib.h>
 
 #define FALSE 0
 #define TRUE 1
 
-typedef struct node {
+typedef struct node { //node의 구조체
 	int data;
 	struct node* link;
 }node;
 
-typedef struct node_H {
-	node* head;
-}node_H;
-
-node_H* A;
 node* top = NULL;
 
 node* CreateNode(int data) { // data를 입력받으면 data를 가진 노드를 생성
@@ -45,7 +46,7 @@ void push(int data) { // 연결리스트이므로 push에 제한없음
 int pop() {
 	if (empty()) {
 		printf("스택이 비어있습니다.\n");
-		return -1;
+		return -1; // 없으면 -1 리턴
 	}
 	int rt_data; // retrun_data
 	node* tmp_link=top;
@@ -55,11 +56,52 @@ int pop() {
 	return rt_data;
 }
 
+int peek() { // top이 가리키는 데이터 리턴
+	if (empty()) {
+		printf("스택이 비어있습니다.\n");
+		return;
+	}
+	return top->data;
+}
+
+void printStack(){
+	if (empty()) {
+		printf("스택이 비어있습니다.\n");
+		return;
+	}
+	node* horse=top;
+	for (; horse != NULL; horse = horse->link) {
+		printf("%d\n", horse->data);
+	}
+	return;
+}
+
 void main() {
 	push(1);
 	push(2);
-	pop();
-	pop();
-	pop();
+	push(3);
+	push(4);
+	printf("<스택을 출력합니다>\n");
+	printStack();
+	printf("peek = %d\n", peek());
+	printf("pop()결과 = %d 를 팝!\n", pop());
+	printf("pop()결과 = %d 를 팝!\n", pop());
+	printf("pop()결과 = %d 를 팝!\n", pop());
+	printf("pop()결과 = %d 를 팝!\n", pop());
+	printf("pop()결과 = %d 를 팝!\n", pop());
 	return;
 }
+------------------------------------------------------------------------------------------------------------
+<출력>
+<스택을 출력합니다>
+4
+3
+2
+1
+peek = 4
+pop()결과 = 4 를 팝!
+pop()결과 = 3 를 팝!
+pop()결과 = 2 를 팝!
+pop()결과 = 1 를 팝!
+스택이 비어있습니다.
+pop()결과 = -1 를 팝!
