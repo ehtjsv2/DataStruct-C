@@ -1,0 +1,65 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+#define FALSE 0
+#define TRUE 1
+
+typedef struct node {
+	int data;
+	struct node* link;
+}node;
+
+typedef struct node_H {
+	node* head;
+}node_H;
+
+node_H* A;
+node* top = NULL;
+
+node* CreateNode(int data) { // data를 입력받으면 data를 가진 노드를 생성
+	node* newnode = (node*)malloc(sizeof(node));
+	newnode->data = data;
+	newnode->link = NULL;
+	return newnode;
+}
+
+int empty() { // 스택이 비었는지 확인.
+	if (top == NULL) {
+		return TRUE;
+	}
+	else return FALSE;
+}
+
+void push(int data) { // 연결리스트이므로 push에 제한없음
+	node* newnode = (node*)malloc(sizeof(node));
+	newnode = CreateNode(data);
+	if (top == NULL) {
+		top = newnode;
+		return;
+	}
+	newnode->link = top;
+	top = newnode;
+	return;
+}
+
+int pop() {
+	if (empty()) {
+		printf("스택이 비어있습니다.\n");
+		return -1;
+	}
+	int rt_data; // retrun_data
+	node* tmp_link=top;
+	rt_data = top->data; // pop할 데이터 저장
+	top = top->link; // pop할 노드의 밑에 노드를 가르키기.
+	free(tmp_link); // pop할 노드는 삭제
+	return rt_data;
+}
+
+void main() {
+	push(1);
+	push(2);
+	pop();
+	pop();
+	pop();
+	return;
+}
