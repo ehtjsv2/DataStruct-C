@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include<stdlib.h>
+#include <string.h>
+
+#define TRUE 1
+#define FALSE 0
+
+typedef struct StackNode { // 스택데이터를 담는 노드 구조체
+	char data;
+	struct StackNode* link;
+}stackNode;
+
+stackNode* top; // top
+
+stackNode* CreateNode(char data) { // 스택노드생성
+	stackNode* newnode = (stackNode*)malloc(sizeof(stackNode));
+	newnode->data = data;
+	newnode->link = NULL;
+	return newnode;
+}
+
+void push(char data) { //push
+	stackNode* newnode = CreateNode(data);
+	if (top == NULL) { // 스택이 비어있다면
+		top = newnode;
+		return;
+	}
+	newnode->link = top; // 비어있지않다면
+	top = newnode;
+	return;
+}
+
+char pop() {
+	if (isEmpty()) { // 비어있으면 
+		printf("스택이 비었습니다.\n");
+		return '0';
+	}
+	stackNode* tmp; // free를 위한 임시저장소
+	char rtdata = top->data; // 리턴을 위한 변수
+	tmp = top;
+	top = top->link;
+	free(tmp);
+	return rtdata;
+}
+
+int isEmpty() { // 비어있는지 확인
+	if (top == NULL)return TRUE;
+	else return FALSE;
+}
+
+main() {
+	top = NULL;
+	char a[] = "these lectrue notes cover the key idaes involves in designing algorithms";
+	//char a[] = "Injae is cool";
+	int length = strlen(a);
+	for (int i = 0; i < length; i++) {
+		push(a[i]);
+	}
+	for (; top != NULL;) {
+		printf("%c", pop());
+	}
+}
+-------------------------------------------------------------------------------------------------------
+<출력>
+smhtirogla gningised ni sevlovni seadi yek eht revoc seton eurtcel eseht
