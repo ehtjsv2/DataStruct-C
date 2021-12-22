@@ -1,0 +1,116 @@
+<배운점>
+
+-문자열 매개변수 이용법
+문자열을 매개변수로 받을때는 char *a로 해야한다 
+char *a[]하면 값이 이상해진다.
+------------------------------------------------------------------------------------------------------------------
+
+#include <stdio.h>
+#include<stdlib.h>
+#include <string.h>
+
+#define TRUE 1
+#define FALSE 0
+
+typedef struct StackNode { // 스택데이터를 담는 노드 구조체
+	char data;
+	struct StackNode* link;
+}stackNode;
+
+stackNode* top; // top
+
+stackNode* CreateNode(char data) { // 스택노드생성
+	stackNode* newnode = (stackNode*)malloc(sizeof(stackNode));
+	newnode->data = data;
+	newnode->link = NULL;
+	return newnode;
+}
+
+void push(char data) { //push
+	stackNode* newnode = CreateNode(data);
+	if (top == NULL) { // 스택이 비어있다면
+		top = newnode;
+		return;
+	}
+	newnode->link = top; // 비어있지않다면
+	top = newnode;
+	return;
+}
+
+char pop() {
+	if (isEmpty()) { // 비어있으면 
+		printf("스택이 비었습니다.\n");
+		return '0';
+	}
+	stackNode* tmp; // free를 위한 임시저장소
+	char rtdata = top->data; // 리턴을 위한 변수
+	tmp = top;
+	top = top->link;
+	free(tmp);
+	return rtdata;
+}
+
+int isEmpty() { // 비어있는지 확인
+	if (top == NULL)return TRUE;
+	else return FALSE;
+}
+
+void printStack() {
+	if (isEmpty()) {
+		printf("비어있습니다\n");
+		return;
+	}
+	stackNode* horse = top;
+	for (; horse != NULL; horse = horse->link) {
+		printf("%c ", horse->data);
+	}
+	printf("\n");
+}
+
+int check_pair(char* str) {
+	int len = strlen(str); // 문자열길이
+	char open_pair; // 쌍이 맞는지 확인 변수
+	char symbol;
+	for (int i = 0; i < len; i++) { // 길이만큼 반복        char a[] = "(a+b)+{a*b+(a+c)}";
+		symbol = str[i];   
+		switch (symbol)
+		{
+		case '[':
+		case '{':
+		case '(':
+			push(symbol);
+			break; // 위의 세개 수식은 푸시후 다음 심볼검사로
+		case ']':
+		case '}':
+		case ')': 
+			if (top == NULL)
+				return FALSE;
+			else {
+				open_pair = pop();
+				if ((symbol == ']' && open_pair != '[') ||
+					(symbol == '}' && open_pair != '{') ||
+					(symbol == ')' && open_pair != '('))
+				{
+					return FALSE;
+				}
+				else break;
+			}
+		}
+	}
+	if (top == NULL) // 반복문 마쳤는데 스택에 괄호남아있으면 쌍 안맞음
+		return 1;
+	else 
+		return FALSE;
+}
+
+main() {
+	top = NULL;
+	char a[] = "{(A+B)-3}*5+[{cos(x+y)+7}-1]*4";
+	if (check_pair(a)) {
+		printf("괄호 쌍이 일치합니다.\n");
+	}
+	else printf("괄호 쌍이 일치하지 않습니다.\n");
+}
+------------------------------------------------------------------------------------------------------------
+<출력>
+괄호 쌍이 일치합니다.
