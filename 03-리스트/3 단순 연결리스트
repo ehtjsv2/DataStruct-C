@@ -3,9 +3,12 @@
  -연결리스트 메모리 해제 시.
  헤드만 free하면 안되고 노드 하나하나 다 free해주어야한다.
  
- ---------
+ ------------------------------------------------------------------------------------------------------------------------------------
+ <코드>
+ 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 // 공백 연결리스트를 생성
@@ -42,6 +45,15 @@ void freeList(linkedList_h* L) { //연결리스트 전체메모리 해제
 	return;
 }
 
+void insertFirstNode(linkedList_h* L, char* data) {
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	node->link = L->head;
+	L->head = node;
+	return;
+}
+
 void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
 	listNode* horse = L->head;
 	while (horse != NULL) {
@@ -53,6 +65,10 @@ void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
 }
 
 void main() {
-	linkedList_h* L = Create_List();
-	freeList(L);
+	linkedList_h* L = Create_List();	// 공백리스트 생성
+	insertFirstNode(L, "월");	// 첫번째 노드로 삽입
+	printList(L);	//리스트 출력
 }
+------------------------------------------------------------------------------------------------------------------------------------
+<출력>
+월 ->
