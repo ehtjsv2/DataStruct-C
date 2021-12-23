@@ -47,15 +47,6 @@ void freeList(linkedList_h* L) { //연결리스트 전체메모리 해제
 	return;
 }
 
-void insertFirstNode(linkedList_h* L, char* data) {
-	listNode* node = (listNode*)malloc(sizeof(listNode));
-	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
-	node->data[strlen(data)] = '\0';
-	node->link = L->head;
-	L->head = node;
-	return;
-}
-
 void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
 	listNode* horse = L->head;
 	while (horse != NULL) {
@@ -66,11 +57,54 @@ void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
 	return;
 }
 
+listNode* searchNode(linkedList_h* L, char* data) { // data를 갖는 노드찾기
+	listNode* p = L->head;
+	while (p != NULL) {
+		if (strcmp(p->data, data) == 0) { // 문자열 비교연산 0이면 일치.
+			return p;
+		}
+		p = p->link;
+	}
+	printf("data를 찾지못했습니다.\n");
+}
+
+void insertFirstNode(linkedList_h* L, char* data) { // 첫번째 노드로 삽입
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	node->link = L->head;
+	L->head = node;
+	return;
+}
+
+
+void insertMiddleNode(linkedList_h* L, listNode* pre, char* data) { // pre뒤에 노드 삽입.
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	listNode* p = L->head;
+	while (p != NULL) {
+		if (p == pre) {
+			node->link = p->link;
+			p->link = node;
+			return;
+		}
+		p = p->link;
+	}
+	printf("pre노드를 찾지못했습니다.\n");
+	return;
+}
+
 void main() {
 	linkedList_h* L = Create_List();	// 공백리스트 생성
 	insertFirstNode(L, "월");	// 첫번째 노드로 삽입
 	printList(L);	//리스트 출력
+	listNode* search = searchNode(L,"월");	// "월" 문자를 포함한 노드 찾기
+	insertMiddleNode(L, search, "화");	// "월"뒤에 "화" 삽입
+	printList(L);	//리스트 출력
+
 }
 ------------------------------------------------------------------------------------------------------------------------------------
 <출력>
 월 ->
+월 ->화 ->
