@@ -5,6 +5,11 @@
  
  -strcpy() 주의점
  strcpy는 문장끝에 '\0'을 넣어주지 않기때문에 조심해야한다.
+ 
+ -deletNode()를 만들 때
+ p->link부터 확인을 시작했으니 p는 확인을 못한다.
+ 따라서 첫번째 원소가 삭제할 원소인지 확인 못하고 지나치게된다.
+ 이 점 주의하고 첫번째 원소일 경우도 생각해야한다.
  ------------------------------------------------------------------------------------------------------------------------------------
  <코드>
  
@@ -99,6 +104,11 @@ void insertLastNode(linkedList_h* L, char* data) { // 마지막 노드를 삽입
 	listNode* node = (listNode*)malloc(sizeof(listNode));
 	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
 	node->data[strlen(data)] = '\0';
+	if (L->head == NULL) { // 리스트가 공백
+		L->head = node;
+		node->link = NULL;
+		return;
+	}
 	listNode* p = L->head;
 	while (p!= NULL) {
 		if (p->link == NULL) {
@@ -111,6 +121,25 @@ void insertLastNode(linkedList_h* L, char* data) { // 마지막 노드를 삽입
 	return;
 }
 
+void deleteNode(linkedList_h* L, listNode* search) {
+	listNode* p = L->head;
+	if (L->head == search) {	// 첫원소가 삭제할 데이터 일 경우
+		L->head = search->link;
+		free(search);
+		return;
+	}
+	while (p->link != NULL) {	
+		if (p->link == search) {
+			p->link = search->link;
+			free(search);
+			return;
+		}
+		p = p->link;
+	}
+	printf("삭제할 데이터를 찾을 수 없습니다.\n");
+	return;
+}
+
 void main() {
 	linkedList_h* L = Create_List();	// 공백리스트 생성
 	insertFirstNode(L, "월");	// 첫번째 노드로 삽입
@@ -120,10 +149,12 @@ void main() {
 	printList(L);	//리스트 출력
 	insertLastNode(L, "수"); // 마지막노드 삽입
 	printList(L);	//리스트 출력
-
+	deleteNode(L, searchNode(L,"화"));	// "화" 노드 삭제
+	printList(L);	//리스트 출력
 }
 ------------------------------------------------------------------------------------------------------------------------------------
 <출력>
 월 ->
 월 ->화 ->
 월 ->화 ->수 ->
+월 ->수 ->
