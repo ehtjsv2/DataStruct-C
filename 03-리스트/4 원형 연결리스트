@@ -13,6 +13,204 @@ do{
 단순 연결리스트에서는 리스트가 공백이든 아니든 그냥 첫번째에 넣으면 됐지만
 원형 연결리스트에서는 마지막노드가 첫번째 노드를 가리켜야 하기때문에
 공백과 아닌것 if else로 나누어서 코드를 짜야한다.
-------------------------------------------------------------------------------------------------------------------------
 
+-원하는 노드 삭제
+노드 삭제할 때 주의할것은 
+첫번재 원소를 삭제할 경우와 두번째원소를 삭제할경우 마지막노드를 삭제할 경우
+다 잘 되는지 확인할 것.
+
+-freeList()
+단순 연결리스트와 달리 애좀 먹었다.
+단순과 똑같이 첫번째노드부터 삭제하면서 진행했더니
+마지막 노드가 가리키는 노드가 사라져 마지막노드의link를 접근하려니 계속 오류가났다.
+생각해보면 결국 마지막에 남는건 마지막노드일것이고 그것을 원형리스트형태로생각하면
+마지막노드가 결국 자신을 가리키는 형태가 될것이므로
+처음부터 마지막노드를 자신을 가리키게하고 하니까 해결이됐다.
 ------------------------------------------------------------------------------------------------------------------------
+<코드>
+include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+// 공백 연결리스트를 생성
+// 연결리스트 전체 메모리 해제
+// 연결리스트 순서대로 출력
+// 노드를 중간에 삽입
+// 마지막 노드로 삽입
+// 노드 입력 후 노드를 삭제
+// 노드를 탐색 후 노드 리턴
+
+typedef struct ListNode { //노드 구조체
+	char data[4];
+	struct Node* link;
+}listNode;
+
+typedef struct linkedList_h { // 리스트의 헤드
+	listNode* head;
+}linkedList_h;
+
+linkedList_h* Create_List() { // 공백 연결리스트 생성
+	linkedList_h* newlist = (linkedList_h*)malloc(sizeof(linkedList_h));
+	newlist->head = NULL;
+	return newlist;
+}
+
+void freeList(linkedList_h* L) { //연결리스트 전체메모리 해제
+	listNode* p=L->head;
+	while (p->link != L->head) {
+		p = p->link;
+	}
+	p->link = p;
+	p = NULL;
+	while (L->head != L->head->link) {
+		p = L->head;
+		L->head = L->head->link;
+		printf("%s삭제 ->", p->data);
+		free(p);
+		if (L->head == L->head->link)break;
+		p = NULL;
+	}
+	printf("%s삭제\n", L->head);
+	free(L->head);
+	printf("리스트 삭제 완료!\n");
+	return;
+}
+
+void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
+	listNode* horse = L->head;
+	do
+	{
+		printf("%s ->", horse->data);
+		horse = horse->link;
+
+	} while (horse != L->head);
+	printf("(순환)%s ->", horse->data);
+	puts("");
+	return;
+}
+
+listNode* searchNode(linkedList_h* L, char* data) { // data를 갖는 노드찾기
+	listNode* p = L->head;
+	
+	do
+	{
+		if (strcmp(p->data, data) == 0) { // 문자열 비교연산 0이면 일치.
+			return p;
+		}
+		p = p->link;
+	} while (p!=L->head);
+	printf("data를 찾지못했습니다.\n");
+}
+
+void insertFirstNode(linkedList_h* L, char* data) { // 첫번째 노드로 삽입, 마지막노드를 첫번째노드와 연결필요.
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	if (L->head == NULL) {
+		node->link = node;
+		L->head = node;
+		return;
+	}
+	else{
+		listNode* p = L->head;
+		do
+		{
+			p = p->link;
+		} while (p->link!=L->head); // 여기주의.
+		p->link = node;
+		node->link = L->head;
+		L->head = node;
+	}
+	
+	return;
+}
+
+
+void insertMiddleNode(linkedList_h* L, listNode* pre, char* data) { // pre뒤에 노드 삽입.
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	listNode* p = L->head;
+	do {
+		if (p == pre) {
+			node->link = p->link;
+			p->link = node;
+			return;
+		}
+		p = p->link;
+	} while (p != L->head);
+	printf("pre노드를 찾지못했습니다.\n");
+	return;
+}
+
+
+void insertLastNode(linkedList_h* L, char* data) { // 마지막 노드를 삽입
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	if (L->head == NULL) { // 리스트가 공백
+		L->head = node;
+		node->link = node;
+		return;
+	}
+	listNode* p = L->head;
+	do
+	{
+		p = p->link;
+	} while (p->link!=L->head);
+	node->link = p->link;
+	p->link = node;
+	return;
+}
+
+void deleteNode(linkedList_h* L, listNode* search) {
+	listNode* p = L->head;
+	if (L->head == search) {	// 첫원소가 삭제할 데이터 일 경우
+		do
+		{
+			p = p->link;
+		} while (p->link!=L->head);
+		L->head = search->link;
+		p->link = L->head; //마지막 노드의 순환링크 초기화
+		free(search);
+		return;
+	}
+	else{
+		do
+		{
+			if (p->link == search) {
+				p->link = search->link;
+				free(search);
+				return;
+			}
+			p = p->link;
+		} while (p->link!=L->head);
+	}
+	printf("삭제할 데이터를 찾을 수 없습니다.\n");
+	return;
+}
+
+void main() {
+	linkedList_h* L = Create_List();	// 공백리스트 생성
+	insertFirstNode(L, "수");	// 첫번째 노드로 삽입
+	insertFirstNode(L, "화");	// 첫번째 노드로 삽입
+	insertFirstNode(L, "월");	//첫번째 노드로 삽입
+	printList(L);	//리스트 출력
+	listNode* search = searchNode(L,"화");	// "월" 문자를 포함한 노드 찾기
+	insertMiddleNode(L, search, "화2");	// "월"뒤에 "화" 삽입
+	printList(L);	//리스트 출력
+	insertLastNode(L, "목"); // 마지막노드 삽입
+	printList(L);	//리스트 출력
+	deleteNode(L, searchNode(L,"화"));	// "화" 노드 삭제
+	printList(L);	//리스트 출력
+	freeList(L);	//리스트 삭제
+}
+------------------------------------------------------------------------------------------------------------------------
+<출력>
+월 ->화 ->수 ->(순환)월 ->
+월 ->화 ->화2 ->수 ->(순환)월 ->
+월 ->화 ->화2 ->수 ->목 ->(순환)월 ->
+월 ->화2 ->수 ->목 ->(순환)월 ->
+월삭제 ->화2삭제 ->수삭제 ->목삭제
+리스트 삭제 완료!
