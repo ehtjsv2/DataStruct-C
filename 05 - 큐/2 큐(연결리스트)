@@ -1,0 +1,109 @@
+<배운점>
+-newnode의 링크초기화
+newnode의link를 NULL로 초기화해주는 것을 잊지말자.
+------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+// 공백 큐를 생성
+// 큐가 공백인지 검사
+// 큐의 rear에 원소를 삽입
+// 큐의 front에 있는 원소를 삭제
+// 큐의 front에 있는 원소를 반환
+// 큐의 원소를 출력
+
+typedef struct Node {
+	char data;
+	struct node* link;
+}Node;
+
+typedef struct Queue {
+	Node* front;
+	Node* rear;
+}Queue;
+
+Queue* createQueue() {
+	Queue* Q = (Queue*)malloc(sizeof(Queue));
+	Q->front = NULL;
+	Q->rear = NULL;
+	return Q;
+}
+
+int isEmpty(Queue* Q) {
+	if (Q->front == NULL) {
+		return 1;
+	}
+	else return 0;
+}
+
+void enQueue(Queue* Q,char data) {
+	Node* newnode = (Node*)malloc(sizeof(Node));
+	newnode->data = data;
+	if (isEmpty(Q)==1) {
+		Q->front = newnode;
+		Q->rear = newnode;
+		newnode->link = NULL;
+		return;
+	}
+	else {
+		Q->rear->link = newnode;
+		Q->rear = newnode;
+		newnode->link = NULL;
+		return;
+	}
+}
+
+char peek(Queue* Q) {
+	return Q->front->data;
+}
+
+void printQ(Queue* Q) {
+	Node* p = Q->front;
+	printf("\n큐를 출력합니다!\n");
+	while (p != NULL) {
+		printf("%c -> ", p->data);
+		p = p->link;
+	}
+	printf("NULL!\n");
+	return;
+}
+
+char DeQueue(Queue* Q) {
+	if (isEmpty(Q)) {
+		printf("큐가 비었습니다.\n");
+		return -1;
+	}
+	else {
+		Node* p;
+		char rtdata;
+		p = Q->front;
+		rtdata = p->data;
+		Q->front = Q->front->link;
+		free(p);
+		return rtdata;
+	}
+}
+
+void main() {
+	Queue* Q = createQueue();
+	char data;
+	printf("\n********연결 큐 연산********\n");
+	enQueue(Q, 'A');	// A삽입
+	enQueue(Q, 'B');	// B삽입
+	enQueue(Q, 'C');	// C삽입
+	printQ(Q);
+	data = peek(Q);
+	printf("peek data = %c\n", data);
+	DeQueue(Q);
+	printQ(Q);
+	DeQueue(Q);
+	printQ(Q);
+	DeQueue(Q);
+	printQ(Q);
+
+	enQueue(Q, 'D');
+	enQueue(Q, 'E');
+	printQ(Q);
+}
+------------------------------------------------------------------------------------------------------------
