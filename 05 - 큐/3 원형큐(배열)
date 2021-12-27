@@ -1,0 +1,129 @@
+<배운점>
+
+-원형큐위 핵심
+rear 또는 front +1 % Q_SIZE 해주는 것이다.
+
+-front rear 초기값
+front와 rear 원래와는 달리
+------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define Q_SIZE 4
+
+// 공백 큐를 생성
+// 큐가 공백인지 검사
+// 큐의 rear에 원소를 삽입
+// 큐의 front에 있는 원소를 삭제
+// 큐의 front에 있는 원소를 반환
+// 큐의 원소를 출력
+
+typedef struct QueueType {
+	char queue[Q_SIZE];
+	int front, rear;
+}QueueType;
+
+QueueType* createQueue() { // 이 원형큐는 마지막원소는 비워두는 것을 전제로 한다. 이유는 공백리스트체크와 포화체크를 구분하기위해
+	QueueType* Q = (QueueType*)malloc(sizeof(QueueType));
+	Q->front = 0;	// front는 젤앞원소의 전 원소를 가리킴
+	Q->rear = 0;	// rear는 젤 뒤의 원소를 가리킴
+}
+
+int isEmpty(QueueType* Q) {
+	if (Q->front == Q->rear) {	// front 와 rear랑 같으면 공백
+		return 1;
+	}
+	else return 0;
+}
+
+int isFull(QueueType* Q) {
+	if ((Q->rear+1)%Q_SIZE == Q->front) { // rear+1한 값이 front와 같으면 full
+		return 1;
+	}
+	else return 0;
+}
+
+void enQueue(QueueType* Q, char item) { // rear에 원소를 삽입
+	if (isFull(Q)) {
+		printf("큐가 가득찼습니다!\n");
+		return;
+	}
+	Q->rear = (Q->rear + 1) % Q_SIZE;
+	Q->queue[Q->rear] = item;	// 현재 rear가 가리키기는 곳 다음에 삽입
+	return;
+}
+
+char deQueue(QueueType* Q) {	//큐의 가장 앞원소를 반환후 삭제
+	if (isEmpty(Q)) {
+		printf("큐가 비었습니다.\n");
+		return -1;
+	}
+	return Q->queue[++Q->front];	// ++front후 그 원소를 반환
+}
+
+char peek(QueueType* Q) {	// 큐의 가장 앞원소를 검색
+	if (isEmpty(Q)) {
+		printf("큐가 비었습니다.\n");
+		return -1;
+	}
+	return Q->queue[Q->front+1];
+}
+
+void printQ(QueueType* Q) {	
+	if (isEmpty(Q)) {
+		printf("스택이비었습니다\n");
+		return;
+	}
+	printf("Q 출력 : ");
+	for (int i = (Q->front+1)%Q_SIZE; i <= Q->rear; i++) {
+		printf("%c -> ", Q->queue[i]);
+	}
+	printf("\n");
+	return;
+}
+
+void main() {
+	QueueType* Q1 = createQueue();
+	char data;
+	printf("\n순차 큐 연산 \n");
+	enQueue(Q1, 'A');	// A삽입
+	enQueue(Q1, 'B');	// B삽입
+	enQueue(Q1, 'C');	// C삽입
+	printQ(Q1);	// 큐 출력
+	data = peek(Q1);
+	printf(" peek 원소 : %c \n\n", data);
+	printf("DeQueue();\n");
+	deQueue(Q1);
+	printQ(Q1);
+	printf("\nDeQueue();\n");
+	deQueue(Q1);
+	printQ(Q1);
+	printf("\nDeQueue();\n");
+	deQueue(Q1);
+	printQ(Q1);
+	printf("\n");
+	enQueue(Q1, 'A');	// A삽입
+	enQueue(Q1, 'B');	// B삽입
+	enQueue(Q1, 'C');	// C삽입
+	printQ(Q1);
+	enQueue(Q1, 'D');	// D삽입
+}
+------------------------------------------------------------------------------------------------
+<코드>
+
+순차 큐 연산
+Q 출력 : A -> B -> C ->
+ peek 원소 : A
+
+DeQueue();
+Q 출력 : B -> C ->
+
+DeQueue();
+Q 출력 : C ->
+
+DeQueue();
+스택이비었습니다
+
+Q 출력 : A -> B -> C ->
+큐가 가득찼습니다!
