@@ -1,5 +1,166 @@
 <배운점>
 
 ------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+
+// 공백 연결리스트를 생성
+// 연결리스트 전체 메모리 해제
+// 연결리스트 순서대로 출력
+// 노드를 중간에 삽입
+// 마지막 노드로 삽입
+// 노드 입력 후 노드를 삭제
+// 노드를 탐색 후 노드 리턴
+
+typedef struct ListNode { //노드 구조체
+	char data[4];
+	struct Node* llink;
+	struct Node* rlink;
+}listNode;
+
+typedef struct linkedList_h { // 리스트의 헤드
+	listNode* head;
+}linkedList_h;
+
+linkedList_h* Create_List() { // 공백 연결리스트 생성
+	linkedList_h* newlist = (linkedList_h*)malloc(sizeof(linkedList_h));
+	newlist->head = NULL;
+	return newlist;
+}
+
+void freeList(linkedList_h* L) { //연결리스트 전체메모리 해제
+	listNode* p;
+	while (L->head != NULL) {
+		p = L->head;
+		L->head = L->head->rlink;
+		free(p);
+		p = NULL;
+	}
+	printf("리스트 삭제 완료!\n");
+	return;
+}
+
+void printList(linkedList_h* L) { // 연결리스트 순서대로 출력
+	listNode* horse = L->head;
+	while (horse != NULL) {
+		printf("%s <->", horse->data);
+		horse = horse->rlink;
+	}
+	puts("");
+	return;
+}
+
+listNode* searchNode(linkedList_h* L, char* data) { // data를 갖는 노드찾기
+	listNode* p = L->head;
+	while (p != NULL) {
+		if (strcmp(p->data, data) == 0) { // 문자열 비교연산 0이면 일치.
+			return p;
+		}
+		p = p->rlink;
+	}
+	printf("data를 찾지못했습니다.\n");
+}
+
+void insertFirstNode(linkedList_h* L, char* data) { // 첫번째 노드로 삽입
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	node->llink = NULL;
+	node->rlink = L->head;
+	L->head = node;
+	return;
+}
+
+
+void insertMiddleNode(linkedList_h* L, listNode* pre, char* data) { // pre뒤에 노드 삽입.
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	listNode* p = L->head;
+	if (pre == L->head) {	// pre가 젤 첫노드일 경우
+		node->llink = pre;
+		node->rlink = pre->rlink;
+		pre->rlink = node;
+		return;
+	}
+	while (p->rlink != NULL) {
+		if (p->rlink == pre) {
+			node->llink = pre;
+			node->rlink = pre->rlink;
+			pre->rlink = node;
+			return;
+		}
+		p = p->rlink;
+	}
+	printf("pre노드를 찾지못했습니다.\n");
+	return;
+}
+
+void insertLastNode(linkedList_h* L, char* data) { // 마지막 노드를 삽입
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	strcpy(node->data, data); // node->data 에 문장끝에는 0이 아니라 쓰레기값이 들어있어서 출력할 때 문제를 일으킬수 있기때문에 끝에0을 넣어줌
+	node->data[strlen(data)] = '\0';
+	if (L->head == NULL) { // 리스트가 공백
+		L->head = node;
+		node->rlink = NULL;
+		node->llink = NULL;
+		return;
+	}
+	listNode* p = L->head;
+	while (p->rlink != NULL) {
+		p = p->rlink;
+	}
+	node->llink = p;
+	node->rlink = NULL;
+	p->rlink = node;
+	return;
+}
+void deleteNode(linkedList_h* L, listNode* search) {
+	listNode* p = L->head;
+	if (L->head == search) {	// 첫원소가 삭제할 데이터 일 경우
+		L->head = search->rlink;
+		L->head->llink = NULL;
+		free(search);
+		return;
+	}
+	listNode* back = NULL;
+	while (p->rlink != NULL) {
+		if (p->rlink == search) {
+			p->rlink = search->rlink;
+			back = search->rlink;
+			back->llink = p;
+			free(search);
+			return;
+		}
+		p = p->rlink;
+	}
+	printf("삭제할 데이터를 찾을 수 없습니다.\n");
+	return;
+}
+
+void main() {
+	linkedList_h* L = Create_List();	// 공백리스트 생성
+	insertFirstNode(L, "월");	// 첫번째 노드로 삽입
+	printList(L);	//리스트 출력
+	listNode* search = searchNode(L, "월");	// "월" 문자를 포함한 노드 찾기
+	insertMiddleNode(L, search, "목");	// "월"뒤에 "화" 삽입
+	insertMiddleNode(L, searchNode(L,"월"), "수");	// "월"뒤에 "화" 삽입
+	insertMiddleNode(L, search, "화");	// "월"뒤에 "화" 삽입
+	printList(L);	//리스트 출력
+	insertLastNode(L, "금"); // 마지막노드 삽입
+	printList(L);	//리스트 출력
+	deleteNode(L, searchNode(L, "화"));	// "화" 노드 삭제
+	printList(L);	//리스트 출력
+	freeList(L);	//리스트 삭제
+	printList(L);	//리스트 출력
+}
 ------------------------------------------------------------------------------------------------------------
+<출력>
+월 <->
+월 <->화 <->수 <->목 <->
+월 <->화 <->수 <->목 <->금 <->
+월 <->수 <->목 <->금 <->
+리스트 삭제 완료!
