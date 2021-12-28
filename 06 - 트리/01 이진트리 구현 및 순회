@@ -1,0 +1,94 @@
+<배운점>
+
+------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define Tree_Size 30
+
+typedef struct treeNode { // 트리의 노드 구조체
+	char data;
+	struct treeNode* left;
+	struct treeNode* right;
+}treeNode;
+
+treeNode* createBT() {	//공백 이진트리 생성
+	treeNode* BT = (treeNode*)malloc(sizeof(treeNode));
+	BT->left = NULL;
+	BT->right = NULL;
+	return BT;
+}
+
+int isEmpty(treeNode* BT) {	//이진트리가 공백인지 확인
+	if (BT == NULL) {
+		return 1;
+	}
+	else return 0;
+}
+
+treeNode* makeBT(char item, treeNode* left, treeNode* right) {	// 두개의 이진 서브 트리를 연결해서 item을 루트로하는 이진트리 생성
+	treeNode* BT = createBT();
+	BT->data = item;
+	BT->left = left;
+	BT->right = right;
+	return BT;
+}
+
+treeNode* leftBT(treeNode* BT) {	// 이진트리의 왼쪽 서브트리를 구함
+	return BT->left;
+}
+
+treeNode* rightBT(treeNode* BT) {	// 이진트리의 오른쪽 서브트리를 구함
+	return BT->right;
+}
+
+char data(treeNode* BT) {	// 이진트리의 루트노드의 데이터를 구함
+	return BT->data;
+}
+
+/*이진트리의 순회*/
+//현재 노드를 언제처리하는지에 따라 전위 중위 후위로 나뉘다.
+//젤 먼저 처리하고 왼쪽,오른쪽 서브트리로 가면 '전'
+//왼쪽처리후 현재노드 처리후 오른쪽으로 가면 '중'
+//젤 늦게 처리하고 왼쪽,오른쪽 서브트리로 가면 '후'
+
+void preorder(treeNode* BT) { // 전위순회
+	if (isEmpty(BT))return;
+	printf(" %c ", BT->data);
+	preorder(BT->left);
+	preorder(BT->right);
+}
+
+void inorder(treeNode* BT) { // 중위순회
+	if (isEmpty(BT))return;
+	inorder(BT->left);
+	printf(" %c ", BT->data);
+	inorder(BT->right);
+}
+
+void postorder(treeNode* BT) {	// 후위순회
+	if (isEmpty(BT))return;
+	postorder(BT->left);
+	postorder(BT->right);
+	printf(" %c ", BT->data);
+}
+
+main() {
+	// 수식 (A*B-C/D)를 이진 트리로 만들기
+	treeNode* n7 = makeBT('D', NULL, NULL);
+	treeNode* n6 = makeBT('C', NULL, NULL);
+	treeNode* n5 = makeBT('B', NULL, NULL);
+	treeNode* n4 = makeBT('A', NULL, NULL);
+	treeNode* n3 = makeBT('/', n6, n7);
+	treeNode* n2 = makeBT('*', n4, n5);
+	treeNode* n1 = makeBT('-', n2, n3);
+	printf("\n전위순회 실행 : ");
+	preorder(n1);
+	printf("\n중위순회 실행 : ");
+	inorder(n1);
+	printf("\n후위순회 실행 : ");
+	postorder(n1);
+}
+------------------------------------------------------------------------------------------------------
+
