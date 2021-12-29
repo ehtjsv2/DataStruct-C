@@ -1,9 +1,202 @@
 <배운점>
 
--같은코드 실행할때마다 다른 출력
-값도 똑같은데 왜 안될까,,이유를 몰라 미칠거같다..
+-포인터로 나아가면서 이전의 주소를 기억
+while (succ->right != NULL) {
+			parent = succ;
+			succ = succ->right;
+		}
+ 여기서 이런식으로 많이쓰면서 익숙해졌다.
+ 
+ -visual studio(2022) 포인터 오류
+ 원래 포인터이용해서 접근할 수 없는 곳을 접근하려고하면 오류가떴는데
+ 여기서는 그냥 콘솔창에서 프로그램을 끝내고버리고 별도의 오류메세지가 없다.
+ 
+ -이진 탐색색트리
+ 1. 모든 원소는 서로 다른 유일한 키를 갖는다.
+ 2. 왼쪽 서브 트리에 있는 원소들의 키는 그 루트의 키보다 작다.
+ 3. 오른쪽 서브 트리에 있는 원소들의 키는 그 루트의 키보다 크다.
+ 4. 왼쪽 서브 트리이ㅘ 오른쪽 서브 트리도 이진 탐색 트리이다.
+ 
+ -이진 탐색트리의 시간복잡도
+ 이진 탐색 트리의 시간 복잡도는 O(logN)이다.
+ 
+ -
 ---------------------------------------------------------------------------------------------------------
 <코드>
+#include <stdio.h>
+#include <stdlib.h>
 
+typedef struct treeNode { // 트리의 노드 구조체
+	char key;
+	struct treeNode* left;
+	struct treeNode* right;
+}treeNode;
+
+treeNode* createBST() {	//공백 이진트리 생성
+	treeNode* BST = (treeNode*)malloc(sizeof(treeNode));
+	BST->left = NULL;
+	BST->right = NULL;
+	return BST;
+}
+
+int isEmpty(treeNode* BST) {	//이진트리가 공백인지 확인
+	if (BST == NULL) {
+		return 1;
+	}
+	else return 0;
+}
+
+treeNode* makeBST(char item, treeNode* left, treeNode* right) {	// 두개의 이진 서브 트리를 연결해서 item을 루트로하는 이진트리 생성
+	treeNode* BST = createBST();
+	BST->key = item;
+	BST->left = left;
+	BST->right = right;
+	return BST;
+}
+
+treeNode* leftBST(treeNode* BST) {	// 이진트리의 왼쪽 서브트리를 구함
+	return BST->left;
+}
+
+treeNode* rightBST(treeNode* BST) {	// 이진트리의 오른쪽 서브트리를 구함
+	return BST->right;
+}
+
+char key(treeNode* BST) {	// 이진트리의 루트노드의 데이터를 구함
+	return BST->key;
+}
+
+/* 이진 탐색 트리 */
+
+treeNode* searchBST(treeNode* BST,char x) {
+	treeNode* p = BST;
+	while (p != NULL) {
+		if (p->key == x) {
+			return p;
+		}
+		if (p->key > x) {
+			p = p->left;
+		}
+		else if (p->key < x) {
+			p = p->right;
+		}
+	}
+	printf("찾는 키값이 존재하지 않습니다.\n");
+	return NULL;
+}
+
+treeNode* insertBST(treeNode* p, char x) {
+	if (p == NULL) {
+		treeNode* newnode = (treeNode*)malloc(sizeof(treeNode));
+		newnode->key = x;
+		newnode->left = NULL;
+		newnode->right = NULL;
+		return newnode;
+	}
+	else if (p->key > x) {
+		p->left=insertBST(p->left, x);
+	}
+	else if (p->key < x) {
+		p->right=insertBST(p->right, x);
+	}
+	else printf("이미 같은 키가 있습니다.\n");
+	return p;
+}
+
+treeNode* searchParent(treeNode* BST, char x) {
+	treeNode* p = BST;
+	treeNode* parent=NULL;
+	if (BST->key == x) {
+		return parent;
+	}
+	while ((p != NULL) && (p->key != x)) {
+		parent = p;
+		if (x < p->key)p = p->left;
+		else p = p->right;
+	}
+	return parent;
+}
+
+void deleteBST(treeNode* BST, char x) {
+	treeNode* p = searchBST(BST, x);
+	treeNode* parent;
+	treeNode* child;
+	treeNode* succ;
+	printf("\n삭제할 키:  %c \n", p->key);
+	if (p == NULL) {
+		printf("삭제할 노드가 없습니다\n");
+		return;
+	}
+	parent = searchParent(BST, p->key);
+	if (p->left == NULL && p->right == NULL) {	// 삭제할 노드의 자식이 없음
+		if (parent->left == p)parent->left = NULL;
+		else if (parent->right == p)parent->right = NULL;
+		free(p);
+		return;
+	}
+	else if (p->left == NULL || p->right == NULL) {	// 삭제할 노드의 자식이 하나라도 존재
+		if (p->left != NULL) child = p->left; // 왼쪽에 자식이있다면 
+		else child = p->right;	//오른쪽에 자식이 있다면
+
+		if (parent != NULL) {
+			if (parent->right->key == p->key)parent->right = child;
+			else parent->left = child;
+		}
+		else {
+			BST = child;
+		}
+	}
+	else {
+		parent = p;
+		succ = p->left;
+		while (succ->right != NULL) {
+			parent = succ;
+			succ = succ->right;
+		}
+		parent->right = succ->left;
+		p->key = succ->key;
+		p = succ;
+	}
+	free(p);
+	return;
+}
+
+void inorder(treeNode* BT) { // 중위순회
+	if (BT) {
+		inorder(BT->left);
+		printf(" %c ", BT->key);
+		inorder(BT->right);
+	}
+	return;
+}
+
+main() {
+	treeNode* BST1 = makeBST('5', NULL, NULL);
+	insertBST(BST1, '2');
+	insertBST(BST1, '3');
+	insertBST(BST1, '0');
+	insertBST(BST1, '4');
+	insertBST(BST1, '6');
+	insertBST(BST1, '1');
+	insertBST(BST1, '7');
+	insertBST(BST1, '9');
+	inorder(BST1);
+
+	deleteBST(BST1, '1');
+	inorder(BST1);
+	
+	deleteBST(BST1, '5');
+	inorder(BST1);
+
+	deleteBST(BST1, '6');
+	inorder(BST1);
+}
 ---------------------------------------------------------------------------------------------------------
 <출력>
+ 0  1  2  3  4  5  6  7  9
+삭제할 키:  1
+ 0  2  3  4  5  6  7  9
+삭제할 키:  5
+ 0  2  3  4  6  7  9
+삭제할 키:  6
+ 0  2  3  4  7  9
