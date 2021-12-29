@@ -20,7 +20,15 @@ while (succ->right != NULL) {
  -이진 탐색트리의 시간복잡도
  이진 탐색 트리의 시간 복잡도는 O(logN)이다.
  
- -
+ -delete()주의점
+ 1. 삭제할 노드의 자식이 없는경우
+ ㄴ루트노드를 삭제하는 건 아닌지 확인필요(부모노드가 NULL일경우는 루트노드이다.)
+ 2. 삭제할 노드의 자식이 하나 있을경우
+ ㄴ자식노드의 주소를 미리파악->부모노드의 왼쪽or오른쪽이 삭제할노드인지 파악->부모노드 왼쪽or오른쪽 자식노드 삽입.
+ 3. 삭제할 노드의 자식이 두개있을경우
+ ㄴ후계자 찾기(왼쪽서브트리의 제일오른쪽 노드 or 오른쪽서브트리의 제일왼쪽 노드) -> 후계자의 자식노드를 부모노드와 연결-> 삭제할 노드의 자리에 삽입
+ ㄴ삭제할 노드에 후계자를 넣을 때 노드를 바꾸기보다는 key값만 교체. 그 후 후계자노드 없애버리기(free)
+ 
 ---------------------------------------------------------------------------------------------------------
 <코드>
 #include <stdio.h>
@@ -129,10 +137,11 @@ void deleteBST(treeNode* BST, char x) {
 	}
 	parent = searchParent(BST, p->key);
 	if (p->left == NULL && p->right == NULL) {	// 삭제할 노드의 자식이 없음
-		if (parent->left == p)parent->left = NULL;
-		else if (parent->right == p)parent->right = NULL;
-		free(p);
-		return;
+		if (parent != NULL) {	// 삭제할 노드가 root노드가 아닐경우
+			if (parent->left == p)parent->left = NULL;
+			else if (parent->right == p)parent->right = NULL;
+		}
+		else BST = NULL;	// 삭제할 노드가 root노드 일경우
 	}
 	else if (p->left == NULL || p->right == NULL) {	// 삭제할 노드의 자식이 하나라도 존재
 		if (p->left != NULL) child = p->left; // 왼쪽에 자식이있다면 
