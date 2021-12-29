@@ -2,8 +2,107 @@
 
 -스레드 이진트리란
 스레드 이진트리란 원래 이진트리순회 할때 재귀함수의 단점을 보완한 트리이다.
----------------------------------------------------------------------------------------------------------------
-<코드>
+
+-스레드 이진트리의 중위순회
+마지막 자식노드의 오른쪽NULL대신 다음 처리할 노드를 가리킨다.
+첫 시작은 마지막 층의 젤왼쪽부터 시작한다.
+1. 그 노드 처리후, 그 노드의 오른쪽이 NULL이면 종료,
+2. 또는 그 노드의 오른쪽스레드 값이 1이면 오른쪽 노드 반환
+3. 또는 그 노드의 오른쪽스레드 값이 0이면 오른쪽 노드의 젤왼쪽 자식으로 이동.
+4. 123 반복
 
 ---------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define Tree_Size 30
+
+typedef struct treeNode { // 트리의 노드 구조체
+	char data;
+	struct treeNode* left;
+	struct treeNode* right;
+	int RightThread;
+}treeNode;
+
+treeNode* createBT() {	//공백 이진트리 생성
+	treeNode* BT = (treeNode*)malloc(sizeof(treeNode));
+	BT->left = NULL;
+	BT->right = NULL;
+	return BT;
+}
+
+int isEmpty(treeNode* BT) {	//이진트리가 공백인지 확인
+	if (BT == NULL) {
+		return 1;
+	}
+	else return 0;
+}
+
+treeNode* makeBT(char item, treeNode* left, treeNode* right,int Thread) {	// 두개의 이진 서브 트리를 연결해서 item을 루트로하는 이진트리 생성
+	treeNode* BT = createBT();
+	BT->data = item;
+	BT->left = left;
+	BT->right = right;
+	BT->RightThread=Thread;
+	return BT;
+}
+
+treeNode* leftBT(treeNode* BT) {	// 이진트리의 왼쪽 서브트리를 구함
+	return BT->left;
+}
+
+treeNode* rightBT(treeNode* BT) {	// 이진트리의 오른쪽 서브트리를 구함
+	return BT->right;
+}
+
+char data(treeNode* BT) {	// 이진트리의 루트노드의 데이터를 구함
+	return BT->data;
+}
+
+/*스레드 이진트리의 중위순회*/
+//마지막 자식노드의 오른쪽NULL대신 다음 처리할 노드를 가리킨다.
+//첫 시작은 마지막 층의 젤왼쪽부터 시작한다.
+//그 노드 처리후, 그 노드의 오른쪽이 NULL이면 종료,
+//또는 그 노드의 오른쪽스레드 값이 1이면 오른쪽 노드 반환
+//또는 그 노드의 오른쪽스레드 값이 0이면 오른쪽 노드의 젤왼쪽 자식으로 이동.
+
+
+
+treeNode* findSuccessor(treeNode* p) {
+	treeNode* q = p->right;
+	if (q == NULL)return q;
+	else if (p->RightThread == 1) return q;
+	while (q->left != NULL)q = q->left;
+	return q;
+}
+
+void threadInorder(treeNode* BT){	//스레드 중위순회
+	treeNode* p=BT;
+	while (p->left != NULL)p = p->left;
+	do {
+		printf(" %c ", p->data);
+		p = findSuccessor(p);
+	} while (p);
+}
+
+main() {
+	// 수식 (A*B-C/D)를 이진 트리로 만들기
+	treeNode* n7 = makeBT('D', NULL, NULL,0);
+	treeNode* n6 = makeBT('C', NULL, NULL,1);
+	treeNode* n5 = makeBT('B', NULL, NULL,1);
+	treeNode* n4 = makeBT('A', NULL, NULL,1);
+	treeNode* n3 = makeBT('/', n6, n7,0);
+	treeNode* n2 = makeBT('*', n4, n5,0);
+	treeNode* n1 = makeBT('-', n2, n3,0);
+
+	n4->right = n2;
+	n5->right = n1;
+	n6->right = n3;
+
+	printf("쓰레드이진트리 중위순회 실행 : ");
+	threadInorder(n1);
+}
+---------------------------------------------------------------------------------------------------------------
 <출력>
+쓰레드이진트리 중위순회 실행 :  A  *  B  -  C  /  D
