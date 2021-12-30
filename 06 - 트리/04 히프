@@ -1,7 +1,72 @@
 <배운점>
 
+-반복문 간소화 하기
+while (n != 1) {
+		if (item > h->heap[n / 2]) {
+			h->heap[n] = h->heap[n / 2];
+			n = n / 2;
+		}
+		else break;
+	}
+여기서 else는 break말고 다른게 없기때문에 이렇게 고칠수있다.
+while ((n != 1) && (item > h->heap[n / 2])) {
+		h->heap[n] = h->heap[n / 2];
+		n = n / 2;
+	}
+  
+-최대힙과 최소힙
+히프는 완전 이진트리에서 키값이 가장 큰노드를 찾거나 가장 작은노드를 찾기위해 만들어진 자료구조이다.
+최대힙에서는 루트에 최대값을 최소힙에서는 루트에 최솟값을 가지고있다.
+
+-최대히프
+부모노드의 키값 >= 자식노드의 키값
+
+-최소히프
+부모노드의 키값 <= 자식노드의 키값
+
+
 ---------------------------------------------------------------------------------------------------------
 <코드>
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_ELEMENT 100
 
+//최대힙 구현
+
+
+typedef struct {
+	int heap[MAX_ELEMENT];
+	int heap_size;
+}heapType;
+
+heapType* createHeap() {
+	heapType* h = (heapType*)malloc(sizeof(heapType));
+	h->heap_size = 0;
+	return h;
+}
+
+void insertHeap(heapType* h, int item) {
+	int n = 0;
+	if (h->heap_size >= MAX_ELEMENT-1) {
+		printf("힙이 가득 찼습니다.\n");
+		return;
+	}
+	h->heap_size++;
+	n = h->heap_size;
+	h->heap[n] = item;
+	while (n != 1) {
+		if (item > h->heap[n / 2]) {
+			h->heap[n] = h->heap[n / 2];
+			n = n / 2;
+		}
+		else break;
+	}
+	h->heap[n] = item;
+	return;
+}
+
+main() {
+	heapType* Heap = createHeap;
+}
 ---------------------------------------------------------------------------------------------------------
 <출력>
