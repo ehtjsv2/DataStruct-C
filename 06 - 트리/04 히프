@@ -33,6 +33,13 @@ while ((n != 1) && (item > h->heap[n / 2])) {
 //제일 마지막 노드를 루트노드로 가져온다.
 //그 후 두개의 자식 중 더 큰 자식과 비교해서 자식이 더 크다면 교환하는 방식.
 
+-삭제연산 주의사항
+//92번줄 코드에
+//(child < h->heap_size) && (h->heap[child] < h->heap[child + 1])
+//이 부분에서 child< h->heap_size를 안해주면 
+//h->heap[child+1]에서 엉뚱한 데이터를 가리키기 때문에 꼭 첫 조건으로 넣어줘야한다
+
+
 ---------------------------------------------------------------------------------------------------------
 <코드>
 #include <stdio.h>
@@ -73,8 +80,88 @@ void insertHeap(heapType* h, int item) {
 	return;
 }
 
+int deleteHeap(heapType* h) {
+	int parent, child;
+	int item, temp;
+	item = h->heap[1];	// 반환할 키
+	temp = h->heap[h->heap_size];	// 마지막 노드의 키 저장
+	h->heap[h->heap_size--] = 0;	// 마지막 노드 비워주기
+	parent = 1;
+	child = 2;
+	while (child <= h->heap_size) {
+		if ((child < h->heap_size) && (h->heap[child] < h->heap[child + 1]))child++; // child가 heap_size랑 같아버리면 h->heap[child+1]은 알수없는 값을 가르키기 때문에 더 작아야된다.
+		if (temp >= h->heap[child])break;
+		else {
+			h->heap[parent] = h->heap[child];
+			parent = child;
+			child = child * 2;
+		}
+	}
+	h->heap[parent] = temp;
+	return item;
+}
+
+void printHeap(heapType* h) {
+	if (h->heap_size == 0) {
+		printf("힙이 비었습니다\n");
+		return;
+	}
+	for (int i = 1; i <= h->heap_size; i++) {
+		printf(" %d ", h->heap[i]);
+	}
+	printf("\n");
+	return;
+}
+
+
+
 main() {
-	heapType* Heap = createHeap;
+	heapType* Heap = createHeap();
+	insertHeap(Heap, 20);
+	insertHeap(Heap, 13);
+	insertHeap(Heap, 19);
+	insertHeap(Heap, 8);
+	insertHeap(Heap, 15);
+	insertHeap(Heap, 10);
+	insertHeap(Heap, 23);
+	printHeap(Heap);
+
+	printf("\n%d 삭제\n",deleteHeap(Heap));	// 1
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 2
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 3
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 4
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 5
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 6
+	printHeap(Heap);
+	printf("\n%d 삭제\n", deleteHeap(Heap));	// 7
+	printHeap(Heap);
 }
 ---------------------------------------------------------------------------------------------------------
 <출력>
+ 23  15  20  8  13  10  19
+
+23 삭제
+ 20  15  19  8  13  10
+
+20 삭제
+ 19  15  10  8  13
+
+19 삭제
+ 15  13  10  8
+
+15 삭제
+ 13  8  10
+
+13 삭제
+ 10  8
+
+10 삭제
+ 8
+
+8 삭제
+힙이 비었습니다
