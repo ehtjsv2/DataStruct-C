@@ -1,0 +1,88 @@
+<배운점>
+
+-createGraph()
+이 함수에서 이중for문해서 adjMatrix에 0을 하나씩 넣어줬는데
+이 코드를 해주지않으면 adjMatrix에 쓰레기값들이 들어있기때문에 나중에 오류를 일으킬수있다.
+
+
+-------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_VERTEX 30
+
+//인접행렬 그래프 구현
+
+
+typedef struct {
+	int n;
+	int adjMatrix[MAX_VERTEX][MAX_VERTEX];
+}graphType;
+
+graphType* createGraph() {	// 공백 그래프를 생성
+	graphType* g = (graphType*)malloc(sizeof(graphType));
+	g->n = 0;
+	for (int j = 0; j < MAX_VERTEX; j++) {
+		for (int i = 0; i < MAX_VERTEX; i++) {
+			g->adjMatrix[i][j] = 0;
+		}
+	}
+	return g;
+}
+
+int isEmpty(graphType* g) {	// 그래프가 정점이 없는 공백 리스트인지 검사
+	if (g->n == 0)return 1;
+	else return 0;
+}
+
+void insertVertex(graphType* g,int v) {	// 그래프 g에 정점 v를 삽입하는 연산
+	if (g->n < MAX_VERTEX)g->n++; //실제로는 그냥 정점 0부터 1,2,3,---순서대로 넣는연산이다.
+	else printf("MAX_VERTEX를 초과했습니다.\n");
+	return;
+}
+
+void insertEdge(graphType* g,int u,int v) {	// 그래프 g에 간선 (u,v)를 삽입하는 연산
+	if (u >= g->n || v >= g->n) {
+		printf("그래프 g에 존재하지 않는 정점을 입력했습니다.\n");
+		return;
+	}
+	g->adjMatrix[u][v] = 1;
+	g->adjMatrix[v][u] = 1;	// 무방향 그래프이기때문에
+	return;
+}
+
+void printGraph(graphType* g) {	// 인접행렬그래프 출력
+	printf("  ");
+	for (int i = 0; i < g->n; i++) {
+		printf("%2d", i);
+	}
+	puts("");
+	for (int j = 0; j < g->n; j++) {
+		printf("%2d",j);
+		for (int i = 0; i < g->n; i++) {
+			printf("%2d", g->adjMatrix[j][i]);
+		}
+		printf("\n");
+	}
+}
+
+main() {
+	graphType* G = createGraph();
+	for (int i = 0; i < 4; i++) {
+		insertVertex(G, i);
+	}
+	insertEdge(G, 0, 1);
+	insertEdge(G, 0, 3);
+	insertEdge(G, 1, 2);
+	insertEdge(G, 1, 3);
+	insertEdge(G, 2, 3);
+	printGraph(G);
+}
+
+-------------------------------------------------------------------------------------------------------------------
+<출력>
+   0 1 2 3
+ 0 0 1 0 1
+ 1 1 0 1 1
+ 2 0 1 0 1
+ 3 1 1 1 0
