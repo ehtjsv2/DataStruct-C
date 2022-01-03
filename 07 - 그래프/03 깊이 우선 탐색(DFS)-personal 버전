@@ -1,0 +1,191 @@
+<배운점>
+
+-personal 버전
+일단 책의 코드대로 짜지않고 혼자 짜보았다
+그리고 책을보고 부족한 부분이 무엇인지 확인하고
+따로 또 올리겠다.
+
+-DFS란
+//깊이우선탐색이란 미로가 있다면 한방향으로 계속가다가 더이상 갈수있는길이 없을경우 젤 '최근'갈림길로 돌아가서 방문안한 갈림길로 가는것이다.
+//project_army에서 두번 정도 했던지라 처음보다 구현하기 어렵지 않았다.
+//스택의 역할은 다시 '최근' 갈림길로 돌아가기위해 기억하는 공간이다. 그래서 last in - first out 구조인 스택을 사용하는 것이다.
+
+-아쉬운점
+DFS()에 보면 while(p!=NULL)부분을 볼수있는데
+거기 안에있는 if()문을 while()조건문 이랑 같이 합칠 수 있을거같은데
+조합이 잘 안된다.
+
+
+
+
+------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTEX 30
+
+//인접리스트 그래프 DFS 구현
+//DFS()함수 부분만 보면된다
+//나머지 것들은 이전에 다뤘던 것들이라 다루지않겠다.
+
+typedef struct {	 // 정점을 가진 노드 구조체
+	int vertex;	// 정점
+	struct graphNode* link;	// 링크
+}graphNode;
+
+typedef struct {	// 그래프 구조체
+	int n;	// 정점의 개수
+	int visited[MAX_VERTEX];
+	graphNode* adjLish_H[MAX_VERTEX];	// 정점의 인접노드 포인터
+}graphType;
+
+typedef struct {
+	int arr[MAX_VERTEX];
+	int top;
+}STACK;
+
+int isEmpty(graphType* g) {	// 그래프 공백체크
+	if (g->n == 0)return 1;
+	else return 0;
+}
+
+graphType* createGraph() {	// 공백 그래프 생성
+	graphType* g = (graphType*)malloc(sizeof(graphType));
+	g -> n = 0;
+	
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		g->adjLish_H[i] = NULL;
+		g->visited[i] = 0;
+	}
+	return g;
+}
+
+graphNode* createNode(int v) {	// 공백 노드 생성
+	graphNode* newnode = (graphNode*)malloc(sizeof(graphNode));
+	newnode->link = NULL;
+	newnode->vertex = v;
+}
+
+void insertVertex(graphType* g, int v) {	// 정점 추가
+	if (g->n >= MAX_VERTEX - 1) {
+		printf("MAX_VERTEX에 도달했습니다.\n");
+		return;
+	}
+	g->n++;	// 실제로 v를 추가하는 건 없고 정점은 자동으로 0부터 +1씩 추가된다
+}
+
+void insertEdge(graphType* g, int u, int v) {	// 정점 u와 v사이 간선 추가
+	if (u >= g->n || v >= g->n) {
+		printf("존재하지 않는 정점입니다.\n");
+		return;
+	}
+	graphNode* newnode1 = createNode(v); // 정점 v를 가진 노드 생성
+	newnode1->link = g->adjLish_H[u];	// v를 가진 노드의 다음 링크는 u의 젤앞 인접노드주소를 가지고
+	g->adjLish_H[u] = newnode1;	// u의 젤앞 인접노드를 v로 설정해준다
+
+	graphNode* newnode2 = createNode(u);
+	newnode2->link = g->adjLish_H[v];
+	g->adjLish_H[v] = newnode2;
+	return;
+}
+
+void printGraph(graphType* g) {	// 인접리스트 그래프 프린트
+	if (isEmpty(g)) {
+		printf("그래프가 비었습니다.\n");
+	}
+	graphNode* horse = NULL;
+	for (int i = 0; i < g->n; i++) {
+		printf("정점 %c의 인접리스트 ", i + 65);
+		horse = g->adjLish_H[i];
+		while (horse != NULL) {
+			printf("-> %c ", (horse->vertex)+65);
+			horse = horse->link;
+		}
+		puts("");
+	}
+}
+
+STACK* createStack() {
+	STACK* s = (STACK*)malloc(sizeof(STACK));
+	s->top = -1;
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		s->arr[i] = 0;
+	}
+	return s;
+}
+
+void push(STACK* s, int data) {
+	if (s->top >= MAX_VERTEX - 1) {
+		printf("스택이 가득 찼습니다.\n");
+		return;
+	}
+	s->arr[++s->top] = data;
+	return;
+}
+
+int pop(STACK* s) {
+	if (s->top < 0) {
+		printf("스택이 비었습니다\n");
+		return -1;
+	}
+	return s->arr[s->top--];
+}
+
+void DFS(graphType* g) {
+	puts("");
+	if (isEmpty(g)) {
+		printf("그래프가 비었습니다.\n");
+		return;
+	}
+	STACK* stack = createStack();	// 스택생성
+	graphNode* p;
+	for (int i = 0; i< g->n; i++) {	// visited  방문안함으로 초기화
+		g->visited[i] = 0;
+	}
+	int visit;	// 현재 방문중인 정점
+	visit = 0;	// 최초 방문 정점을 'A'(0)으로 지정
+	push(stack, visit);	// visit를 push()
+	printf("DFS시작 : %c ", visit+65);	//visit를 출력
+	g->visited[visit] = 1;	//visit를 방문했다고 기록(1)
+	while (stack->top >= 0) {	// 스택에 비어있지 않을 때 까지
+		p = g->adjLish_H[visit];	// p는 인접정점을 가리킴
+		while(p!=NULL){	// p가 인접정점중 방문하지 않은 정점을 찾거나 p가 NULL일 때까지
+			if (g->visited[p->vertex] == 0)break;
+			else p = p->link;	
+		}
+		if (p == NULL) {	// 모든 인접정점이 방문했을경우
+			visit = pop(stack);	// pop()해서 visit를 이전에 방문했던 정점으로 돌아감
+		}
+		else {	// 방문하지 않은 인접정점을 찾았을 경우
+			visit = p->vertex;	// p가 찾은 정점을 visit로
+			push(stack, visit);	// visit를 push()
+			printf("-> %c ", visit + 65);	// visit 출력
+			g->visited[visit] = 1;	//visit를 방문했다고 기록(1)
+		}
+	}
+	puts("");
+	return;
+}
+
+void main() {
+	graphType* G;
+	G = createGraph();
+
+	for (int i = 0; i < 7; i++) {
+		insertVertex(G, i);
+	}
+	insertEdge(G, 0, 1);
+	insertEdge(G, 0, 2);
+	insertEdge(G, 1, 3);
+	insertEdge(G, 1, 4);
+	insertEdge(G, 2, 4);
+	insertEdge(G, 3, 6);
+	insertEdge(G, 4, 6);
+	insertEdge(G, 6, 5);
+
+	printGraph(G);
+	DFS(G);
+}
+------------------------------------------------------------------------------------------------
+<출력>
