@@ -1,7 +1,159 @@
 <배운점>
 
-------------------------------------------------------------------------------------
-<코드>
+-재귀함수 이용 DFS
+재귀함수를 이용하니까 훨씬 쉽고 코드도 간단하다.
+STACK도 사용하지 않는다.
 
 ------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTEX 30
+
+//인접리스트 그래프 DFS 구현
+
+typedef struct {	 // 정점을 가진 노드 구조체
+	int vertex;	// 정점
+	struct graphNode* link;	// 링크
+}graphNode;
+
+typedef struct {	// 그래프 구조체
+	int n;	// 정점의 개수
+	int visited[MAX_VERTEX];
+	graphNode* adjLish_H[MAX_VERTEX];	// 정점의 인접노드 포인터
+}graphType;
+
+typedef struct {
+	int arr[MAX_VERTEX];
+	int top;
+}STACK;
+
+int isEmpty(graphType* g) {	// 그래프 공백체크
+	if (g->n == 0)return 1;
+	else return 0;
+}
+
+graphType* createGraph() {	// 공백 그래프 생성
+	graphType* g = (graphType*)malloc(sizeof(graphType));
+	g->n = 0;
+
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		g->adjLish_H[i] = NULL;
+		g->visited[i] = 0;
+	}
+	return g;
+}
+
+graphNode* createNode(int v) {	// 공백 노드 생성
+	graphNode* newnode = (graphNode*)malloc(sizeof(graphNode));
+	newnode->link = NULL;
+	newnode->vertex = v;
+}
+
+void insertVertex(graphType* g, int v) {	// 정점 추가
+	if (g->n >= MAX_VERTEX - 1) {
+		printf("MAX_VERTEX에 도달했습니다.\n");
+		return;
+	}
+	g->n++;	// 실제로 v를 추가하는 건 없고 정점은 자동으로 0부터 +1씩 추가된다
+}
+
+void insertEdge(graphType* g, int u, int v) {	// 정점 u와 v사이 간선 추가
+	if (u >= g->n || v >= g->n) {
+		printf("존재하지 않는 정점입니다.\n");
+		return;
+	}
+	graphNode* newnode1 = createNode(v); // 정점 v를 가진 노드 생성
+	newnode1->link = g->adjLish_H[u];	// v를 가진 노드의 다음 링크는 u의 젤앞 인접노드주소를 가지고
+	g->adjLish_H[u] = newnode1;	// u의 젤앞 인접노드를 v로 설정해준다
+
+	graphNode* newnode2 = createNode(u);
+	newnode2->link = g->adjLish_H[v];
+	g->adjLish_H[v] = newnode2;
+	return;
+}
+
+void printGraph(graphType* g) {	// 인접리스트 그래프 프린트
+	if (isEmpty(g)) {
+		printf("그래프가 비었습니다.\n");
+	}
+	graphNode* horse = NULL;
+	for (int i = 0; i < g->n; i++) {
+		printf("정점 %c의 인접리스트 ", i + 65);
+		horse = g->adjLish_H[i];
+		while (horse != NULL) {
+			printf("-> %c ", (horse->vertex) + 65);
+			horse = horse->link;
+		}
+		puts("");
+	}
+}
+
+STACK* createStack() {
+	STACK* s = (STACK*)malloc(sizeof(STACK));
+	s->top = -1;
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		s->arr[i] = 0;
+	}
+	return s;
+}
+
+void push(STACK* s, int data) {
+	if (s->top >= MAX_VERTEX - 1) {
+		printf("스택이 가득 찼습니다.\n");
+		return;
+	}
+	s->arr[++s->top] = data;
+	return;
+}
+
+int pop(STACK* s) {
+	if (s->top < 0) {
+		printf("스택이 비었습니다\n");
+		return -1;
+	}
+	return s->arr[s->top--];
+}
+
+void DFS(graphType* g,int v) {
+	printf("%c -> ",v + 65);
+	g->visited[v]=1;
+	graphNode* p = g->adjLish_H[v];
+	while (p != NULL) {
+		if (g->visited[p->vertex] == 0) {
+			DFS(g, p->vertex);
+		}
+		else p = p->link;
+	}
+}
+
+void main() {
+	graphType* G;
+	G = createGraph();
+
+	for (int i = 0; i < 7; i++) {
+		insertVertex(G, i);
+	}
+	insertEdge(G, 0, 1);
+	insertEdge(G, 0, 2);
+	insertEdge(G, 2, 4);
+	insertEdge(G, 3, 6);
+	insertEdge(G, 4, 6);
+	insertEdge(G, 6, 5);
+
+	printGraph(G);
+	printf("\nDFS(G,'A')시작 : ");
+	DFS(G,0);
+}
+------------------------------------------------------------------------------------
 <출력>
+정점 A의 인접리스트 -> C -> B
+정점 B의 인접리스트 -> A
+정점 C의 인접리스트 -> E -> A
+정점 D의 인접리스트 -> G
+정점 E의 인접리스트 -> G -> C
+정점 F의 인접리스트 -> G
+정점 G의 인접리스트 -> F -> E -> D
+
+DFS(G,'A')시작 : A -> C -> E -> G -> F -> D -> B ->
