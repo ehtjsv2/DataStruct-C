@@ -1,0 +1,106 @@
+<배운점>
+
+//알고리즘 적혀있는 순서대로 하니 편했다.
+
+-for (int i = 0; i < MAX_VERTEX-2; i++) 
+다익스트라 알고리즘 안에서 이러한 부분이있는데 -2인 이유는
+처음에 0에 대해서는 거리 갱신했으니 -1
+마지막노드는 연결해도 거리 갱신에 변화 없으니 -1
+
+-시간복잡도
+O(V^2)이다.
+이유는 처음에 정점 개수만큼의 for문이 있고 findMinVer할때도 정점개수만큼의 for문이 있으므로.
+정점은 많고 간선이 적은 그래프에서 치명적일 수 있다.
+우선 순위 큐를 사용하면 O(ElogV)까지 줄어든다니 우선 순위 큐로 구현 해보겠다.
+
+------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTEX 5
+#define INF 10000 // 무한대 약자
+
+int weight[MAX_VERTEX][MAX_VERTEX] = { // 그래프의 가중치 인접행렬
+	{0,10,5,INF,INF},
+	{INF,0,2,1,INF},
+	{INF,3,0,9,2},
+	{INF,INF,INF,0,4},
+	{7,INF,INF,6,0}
+};
+int distance[MAX_VERTEX];	// 시작 정점부터 v까지의 최단거리
+int S[MAX_VERTEX];	// 정점 v를 방문했는가? T->1 F->0
+
+void printDistance() {
+	puts("");
+	for (int i = 0; i < MAX_VERTEX; i++)
+		printf("%6d ", distance[i]);
+}
+
+void Dijkstra(int v) {	// 정점v로부터 다른 정점까지의 최단거리를 계산
+	//1.출발 노드 설정
+	int current=v;
+	//2. 출발 노드를 기준으로 각 노드의 최소 비용 저장
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		distance[i] = weight[v][i];
+	}
+	S[v] = 1;	// 출발 노드 방문기록
+	//3,4반복
+	for (int i = 0; i < MAX_VERTEX-2; i++) { // v는 이미 연결했고 마지막 노드는 연결해도 똑같기때문에 연결 안해줘도 된다.
+		//3. 방문하지 않은 노드 중에서 가장 비용이 적은 노드 선택
+		current = findMinVer();
+		S[current] = 1;
+		//4. 해당 노드를 거쳐서 특정한 노드로 가능 경루를 고려하여 최소비용 갱신
+		for(int i=0;i<MAX_VERTEX;i++)
+		if (distance[current] + weight[current][i] < distance[i])
+			distance[i] = distance[current] + weight[current][i];
+	}
+
+}
+
+int findMinVer() {
+	int min = INF;
+	int index = -1;
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		if (S[i] == 0 && distance[i]!=0) {
+			if (distance[i] < min) {
+				min = distance[i];
+				index = i;
+			}
+		}
+	}
+	return index;
+}
+
+void printWeight() {
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		for (int j = 0; j < MAX_VERTEX; j++)
+			printf("%6d", weight[i][j]);
+		printf("\n");
+	}
+	puts("");
+}
+
+
+
+
+main() {
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		distance[i] = INF;
+		S[i] = 0;
+	}
+	printWeight();
+	Dijkstra(0);
+	printDistance();
+}
+
+------------------------------------------------------------------------------------------------------------
+<출력>
+     0    10     5 10000 10000
+ 10000     0     2     1 10000
+ 10000     3     0     9     2
+ 10000 10000 10000     0     4
+     7 10000 10000     6     0
+
+
+     0      8      5      9      7
