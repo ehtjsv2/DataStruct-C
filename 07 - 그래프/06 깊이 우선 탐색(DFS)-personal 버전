@@ -1,0 +1,169 @@
+<배운점>
+
+-personal 버전
+개념만 이해하고 스스로 코드를 짜보고
+교재와 비교해보고 고쳐보겠다.
+
+-
+--------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTEX 30
+
+//인접리스트 그래프 BFS 구현
+
+typedef struct {	 // 정점을 가진 노드 구조체
+	int vertex;	// 정점
+	struct graphNode* link;	// 링크
+}graphNode;
+
+typedef struct {	// 그래프 구조체
+	int n;	// 정점의 개수
+	int visited[MAX_VERTEX];
+	graphNode* adjLish_H[MAX_VERTEX];	// 정점의 인접노드 포인터
+}graphType;
+
+typedef struct Queue {
+	int data[MAX_VERTEX];
+	int front, rear;
+}Queue;
+
+int isEmpty(graphType* g) {	// 그래프 공백체크
+	if (g->n == 0)return 1;
+	else return 0;
+}
+
+graphType* createGraph() {	// 공백 그래프 생성
+	graphType* g = (graphType*)malloc(sizeof(graphType));
+	g->n = 0;
+
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		g->adjLish_H[i] = NULL;
+		g->visited[i] = 0;
+	}
+	return g;
+}
+
+graphNode* createNode(int v) {	// 공백 노드 생성
+	graphNode* newnode = (graphNode*)malloc(sizeof(graphNode));
+	newnode->link = NULL;
+	newnode->vertex = v;
+}
+
+void insertVertex(graphType* g, int v) {	// 정점 추가
+	if (g->n >= MAX_VERTEX - 1) {
+		printf("MAX_VERTEX에 도달했습니다.\n");
+		return;
+	}
+	g->n++;	// 실제로 v를 추가하는 건 없고 정점은 자동으로 0부터 +1씩 추가된다
+}
+
+void insertEdge(graphType* g, int u, int v) {	// 정점 u와 v사이 간선 추가
+	if (u >= g->n || v >= g->n) {
+		printf("존재하지 않는 정점입니다.\n");
+		return;
+	}
+	graphNode* newnode1 = createNode(v); // 정점 v를 가진 노드 생성
+	newnode1->link = g->adjLish_H[u];	// v를 가진 노드의 다음 링크는 u의 젤앞 인접노드주소를 가지고
+	g->adjLish_H[u] = newnode1;	// u의 젤앞 인접노드를 v로 설정해준다
+
+	graphNode* newnode2 = createNode(u);
+	newnode2->link = g->adjLish_H[v];
+	g->adjLish_H[v] = newnode2;
+	return;
+}
+
+void printGraph(graphType* g) {	// 인접리스트 그래프 프린트
+	if (isEmpty(g)) {
+		printf("그래프가 비었습니다.\n");
+	}
+	graphNode* horse = NULL;
+	for (int i = 0; i < g->n; i++) {
+		printf("정점 %c의 인접리스트 ", i + 65);
+		horse = g->adjLish_H[i];
+		while (horse != NULL) {
+			printf("-> %c ", (horse->vertex) + 65);
+			horse = horse->link;
+		}
+		puts("");
+	}
+}
+
+Queue* createQueue() {
+	Queue* Q = (Queue*)malloc(sizeof(Queue));
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		Q->data[i] = 0;
+	}
+	Q->front = 0;
+	Q->rear = -1;
+}
+
+void enQueue(Queue* Q, int data) {
+	if (Q->rear >= MAX_VERTEX - 1) {
+		printf("Q가 가득 찼습니다.\n");
+		return;
+	}
+	Q->data[++Q->rear] = data;
+	return;
+}
+
+int deQueue(Queue* Q) {
+	if (Q->front > Q->rear) {
+		printf("Q가 비었습니다.\n");
+		return -1;
+	}
+	return Q->data[Q->front++];
+}
+
+void BFS(graphType* g, int v) {
+	Queue* Q = createQueue();
+	graphNode* p = NULL;
+	int visit = v;
+	printf("BFS시작 : %c -> ", visit + 65);
+	g->visited[visit] = 1;
+	enQueue(Q, visit);
+	p = g->adjLish_H[visit];
+	while (Q->front <= Q->rear) {
+		p = g->adjLish_H[deQueue(Q)];
+		while (p != NULL) {
+			if (g->visited[p->vertex] == 0) {
+				visit = p->vertex;
+				printf("%c -> ", visit + 65);
+				g->visited[visit] = 1;
+				enQueue(Q, visit);
+				p = p->link;
+			}
+			else p = p->link;
+		}
+	}
+}
+
+void main() {
+	graphType* G;
+	G = createGraph();
+
+	for (int i = 0; i < 7; i++) {
+		insertVertex(G, i);
+	}
+	insertEdge(G, 0, 1);
+	insertEdge(G, 0, 2);
+	insertEdge(G, 2, 4);
+	insertEdge(G, 3, 6);
+	insertEdge(G, 4, 6);
+	insertEdge(G, 6, 5);
+
+	printGraph(G);
+	BFS(G, 0);
+}
+--------------------------------------------------------------------------------------------------------------------
+<출력>
+정점 A의 인접리스트 -> C -> B
+정점 B의 인접리스트 -> A
+정점 C의 인접리스트 -> E -> A
+정점 D의 인접리스트 -> G
+정점 E의 인접리스트 -> G -> C
+정점 F의 인접리스트 -> G
+정점 G의 인접리스트 -> F -> E -> D
+BFS시작 : A -> C -> B -> E -> G -> F -> D ->
