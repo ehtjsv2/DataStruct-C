@@ -14,6 +14,20 @@
 -BFS 활용 사례
 1. 가중치 없는 그래프 최단거리 구하기
 
+-책 버전과 차이
+visit = deQueue(Q);	// 여기 왔다는건 인접정정을 다 둘러본 것이기때문에 dequeue해서 돌아가기
+for (p = g->adjLish_H[visit]; p; p = p->link) {
+	if (g->visited[p->vertex] == 0) {
+		visit = p->vertex;
+		printf("%c -> ", visit + 65);
+		g->visited[visit] = 1;
+		enQueue(Q, visit);
+	}
+}
+책은 BFS 중간에 이렇게 for문으로 다 합쳐버렸다.
+내 버전을 보면은 if 하고 else 둘다 p=p->link를 하기때문에 for의 증감문으로 넣어도 이상없다.
+p=g->adjList_H[visit] 부분도 while전에 항상하기 때문에 for문의 초기변수로 지정해도 이상없다.
+
 --------------------------------------------------------------------------------------------------------------------
 <코드>
 #include <stdio.h>
