@@ -1,0 +1,96 @@
+<배운점>
+-다익스트라 알고리즘
+// 대표적인 최단 경로 탐색 알고리즘
+// 인공위성 GPS 소프트웨어 등에서 가장 많이 사용.
+
+-다익스트라 알고리즘 과정
+1. 출발 노드 설정
+2. 출발 노드를 기준으로 각 노드의 최소 비용 저장
+3. 방문하지 않은 노드 중에서 가장 비용이 적은 노드를 선택
+4. 해당 노드를 가쳐서 특정한 노드로 가는 경우를 고려하여 최소 비용 갱신
+5. 3~4과정 반복.
+
+-personal 버전
+//
+------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTEX 5
+#define INF 10000 // 무한대 약자
+
+int weight[MAX_VERTEX][MAX_VERTEX] = { // 그래프의 가중치 인접행렬
+	{0,10,5,INF,INF},
+	{INF,0,2,1,INF},
+	{INF,3,0,9,2},
+	{INF,INF,INF,0,4},
+	{7,INF,INF,6,0}
+};
+int distance[MAX_VERTEX];	// 시작 정점부터 v까지의 최단거리
+int S[MAX_VERTEX];	// 정점 v를 방문했는가? T->1 F->0
+
+void Dijkstra(int v) {	// 정점v로부터 다른 정점까지의 최단거리를 계산
+	int visit = v;	// 현재방문 정점을 v로 지정
+	int min;	// 최솟값 변수
+	distance[visit] = 0;
+	for (int i = 0; i < MAX_VERTEX; i++) { // 정점 만큼 반복
+		printf("반복%d번째\n", i);
+		S[visit] = 1;	// 현재 방문정점을 연결했다고 기록
+		min = INF;	// 최솟값을 무한대로
+		for (int i = 0; i < MAX_VERTEX; i++) {	// 정점의 갯수만큼 반복
+			// 연결된 정점기준으로 최단거리 갱신
+			if (distance[visit] + weight[visit][i] < distance[i]) {	// 정점v->현재방문정점까지 거리 + 현재방문정점->정점i까지 거리 < 정점v-> 정점i 일경우
+				distance[i] = distance[visit] + weight[visit][i];	// 정점v->정점i까지의 거리를 수정
+			}
+			//다음에 연결할 정점찾기(가중치작은거 기준, 0제외)
+			if (S[i] == 0) {	// 아직 방문안한 정점이라면
+				if (distance[i] != 0 && min == INF)min = i;	//	0이 아니고 아직 min을 찾지못했다면 min=i로 지정
+				else if (distance[i] < distance[min])min = i;// min보다 작은 가중치를 찾았다면
+			}
+		}
+		visit = min;	// min 방문결정
+	}
+}
+
+void printWeight() {
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		for (int j = 0; j < MAX_VERTEX; j++)
+			printf("%6d", weight[i][j]);
+		printf("\n");
+	}
+	puts("");
+}
+
+void printDistance() {
+	for (int i = 0; i < MAX_VERTEX; i++)
+		printf("%6d ", distance[i]);
+}
+
+
+main() {
+	for (int i = 0; i < MAX_VERTEX; i++) {
+		distance[i] = INF;
+		S[i] = 0;
+	}
+	printWeight();
+	Dijkstra(4);
+	puts("");
+	printDistance();
+}
+
+------------------------------------------------------------------------------------------------
+<출력>
+     0    10     5 10000 10000
+ 10000     0     2     1 10000
+ 10000     3     0     9     2
+ 10000 10000 10000     0     4
+     7 10000 10000     6     0
+
+반복0번째
+반복1번째
+반복2번째
+반복3번째
+반복4번째
+
+     7     15     12      6      0
