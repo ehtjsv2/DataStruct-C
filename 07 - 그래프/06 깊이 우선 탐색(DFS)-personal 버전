@@ -4,7 +4,16 @@
 개념만 이해하고 스스로 코드를 짜보고
 교재와 비교해보고 고쳐보겠다.
 
--
+-BFS과정
+1. 시작 정점 v를 결정하여 방문
+2. 정점 v에 인접한 정점 중에서 방문하지 않은 정점을 차례로 방문하면서 enQueue한다.
+3. 방문하지 않은 인접한 정점이 없으면, 방문했던 정점에서 인접한 정점을 다시 차례로 방문하기 위해 큐에서 deQueue
+하여 받은 정점을 v로 설정하고 2를 반복한다.
+4 큐가 공백이 될 때까지 2~3을 반복한다.
+
+-BFS 활용 사례
+1. 가중치 없는 그래프 최단거리 구하기
+
 --------------------------------------------------------------------------------------------------------------------
 <코드>
 #include <stdio.h>
@@ -116,26 +125,25 @@ int deQueue(Queue* Q) {
 	}
 	return Q->data[Q->front++];
 }
-
 void BFS(graphType* g, int v) {
-	Queue* Q = createQueue();
+	Queue* Q = createQueue();	// 큐생성
 	graphNode* p = NULL;
-	int visit = v;
-	printf("BFS시작 : %c -> ", visit + 65);
-	g->visited[visit] = 1;
-	enQueue(Q, visit);
-	p = g->adjLish_H[visit];
-	while (Q->front <= Q->rear) {
-		p = g->adjLish_H[deQueue(Q)];
-		while (p != NULL) {
-			if (g->visited[p->vertex] == 0) {
-				visit = p->vertex;
-				printf("%c -> ", visit + 65);
-				g->visited[visit] = 1;
-				enQueue(Q, visit);
-				p = p->link;
+	int visit = v;	// 현재 방문 중인 정점
+	printf("BFS시작 : %c -> ", visit + 65);	// 첫정점 출력
+	g->visited[visit] = 1;	// 방문했다고 기록
+	enQueue(Q, visit);	// 첫정점 enqueue
+	p = g->adjLish_H[visit];	//	첫정점의 인접정점을 가리킴
+	while (Q->front <= Q->rear) {	// 큐가 비기 전까지
+		p = g->adjLish_H[deQueue(Q)];	// 여기 왔다는건 인접정정을 다 둘러본 것이기때문에 dequeue해서 돌아가기
+		while (p != NULL) {	// 인접정점을 다 둘러 볼때까지
+			if (g->visited[p->vertex] == 0) {	// 인접정점 아직 방문 안했다면
+				visit = p->vertex;	// 현재 방문 정점으로 설정
+				printf("%c -> ", visit + 65);	// 출력
+				g->visited[visit] = 1;	// 방문했다고 기록
+				enQueue(Q, visit);	// 방문정점 enqueue
+				p = p->link;	// 다음 인접정점을 가리킴 (현재방문 정점의 인접정점이 아님)
 			}
-			else p = p->link;
+			else p = p->link; // 다음 인접 정점을 가리킴
 		}
 	}
 }
