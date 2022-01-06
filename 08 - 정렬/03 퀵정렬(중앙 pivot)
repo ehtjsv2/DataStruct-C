@@ -1,0 +1,70 @@
+<배운점>
+
+-퀵정렬이란
+//특정한 숫자를 기준으로 작은것과 큰것으로 나누는 정렬이다.
+
+-퀵정렬 과정
+
+----------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+//버블 정렬 알고리즘
+// 1. 왼쪽 끝에서 오른쪽으로 움직이면서 피봇보다 '크거나 같은' 원소를 찾아 L로 표시, 단 L은 R과 만나면 멈춘다.
+// 2. 오른쪽 끝에서 왼쪽으로 움직이면서 피봇보다 '작은' 원소를 찾아 R로 표시, 단 R은 L과 만나면 멈춘다
+// 3-a 1~2를 수행하면서 L과 R이 같은 원소에서 만나 멈춘 경우, 피봇과 R의 원소를 서로 교환, 교환 후 교환된 자리를 피봇위치로 확정하고 현재 단계의 퀵정렬을 끝낸다.
+// 3-b 1과 2에서 찾은 L원소와 R원소가 있는 경우, 서로 교환하고 L과 R의 현재위치에서 1~2작업을 다시 수행한다. 
+// 4. 피봇의 확정된 위치를 기준으로 만들어진 새로운 왼쪽 부분 집합과 오른쪽 부분집합에 대해서 1~3의 퀵정렬을 순환적으로 반복수행
+// 단, 부분집합의 크기가 1이하가 되면 전체 퀵 정렬을 종료
+
+void swap(int arr[],int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+void bubbleSort(int arr[],int begin,int end) {	// begin은 제일 왼쪽 원소 인덱스 , end는 제일 오른쪽 원소 인덱스
+	int pivot = begin;
+	int L = begin;
+	int R = end;
+	while (1) {
+		while (arr[L] < arr[pivot] && L != R)L++;	//1
+		while (arr[R] >= arr[pivot] && R != L)R--;  //2
+		if (L == R) { // 3-a
+			swap(arr, L, pivot);	
+			if (L - 1 > begin)bubbleSort(arr, begin, L - 1); // 4 
+			if (L + 1 < end)bubbleSort(arr, L + 1, end); // 4
+			break;
+		}
+		else { // 3-b
+			swap(arr, L, R);
+		}
+	}
+}
+
+
+main() {
+	int arr[] = { 69,10,30,2,16,8,31,22 };
+	int len = sizeof(arr) / sizeof(int);
+
+	printArr(arr, len);
+	bubbleSort(arr, 0, len-1);
+	puts("");
+	printArr(arr, len);
+}
+
+----------------------------------------------------------------------------------------------------------
+<출력>
+69 10 30 2 16 8 31 22
+
+2 8 10 16 22 30 31 69
