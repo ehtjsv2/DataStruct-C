@@ -1,7 +1,105 @@
 <배운점>
 
+-partition()
+//피봇을 중심으로 작은것 큰것을 나누고 피봇의 위치를 정해주며 
+//다음 bubble sort를 위해 pivot의 위치를 반환해주는 함수
+
+-코드의 단순화
+while (1) {
+	while (arr[L] < arr[p] && L < R) L++;
+	while (arr[R] >= arr[p] && L < R)R--;
+	if (L == R) {
+		swap(arr, L, p);
+		return L;
+	}
+	else if(L == p) {
+		swap(arr, L, R);
+		return R;
+	}
+	else swap(arr, L, R);
+}
+//이랬던 코드를 아래와 같이 바꿀수있다.
+while (L < R) {
+	while (arr[L] < arr[p] && L < R) L++;
+	while (arr[R] >= arr[p] && L < R)R--;
+	if (L < R) {
+		swap(arr, L, R);
+		if (L == p) {
+			return R;
+		}
+	}
+}
+swap(arr, p, L);
+return L;
+
+//if(L<R) 이부분은 else if(L==p)와 else 둘다 를 합칠수 있다. 
+//어차피 둘다 swap있으니까 합치고 L==p일경우에는 R만 돌려주는 것으로 합친다.
+//그리고 이 함수는 L이 R보다 커지는 순간(같아지는 순간) 
+//끝나는 것이 명확하기때문에 while(L<R)로 하고 
+//L==p로 return이 안됐고 L>=R조건으로 while문 밖으로 나오면
+//swap하고 L을 return 하는 것으로 끝을 낸다.
+
+
 ----------------------------------------------------------------------------------------------------------------
 <코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+void swap(int arr[],int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+void bubbleSort(int arr[],int begin,int end) {	// begin은 제일 왼쪽 원소 인덱스 , end는 제일 오른쪽 원소 인덱스
+	int pivot;
+	if (begin < end) { // 원소가 하나 이상
+
+		pivot = partition(arr, begin, end);
+
+		bubbleSort(arr, begin, pivot - 1);
+		bubbleSort(arr, pivot+1, end);
+
+	}
+}
+
+int partition(int arr[], int begin, int end) {
+	int p = (begin + end) / 2;
+	int L = begin, R = end;
+	while (1) {
+		while (arr[L] < arr[p] && L < R) L++;
+		while (arr[R] >= arr[p] && L < R)R--;
+		if (L == R) {
+			swap(arr, L, p);
+			return L;
+		}
+		else if(L == p) {
+			swap(arr, L, R);
+			return R;
+		}
+		else swap(arr, L, R);
+	}
+	return L;
+}
+
+main() {
+	int arr[] = { 69,10,11,20,40,29,30,2,16,8,31,22 };
+	int len = sizeof(arr) / sizeof(int);
+
+	printArr(arr, len);
+	bubbleSort(arr, 0, len-1);
+	puts("");
+	printArr(arr, len);
+}
 
 ----------------------------------------------------------------------------------------------------------------
 <출력>
