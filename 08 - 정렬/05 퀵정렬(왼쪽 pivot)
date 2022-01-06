@@ -1,0 +1,65 @@
+<배운점>
+
+-return
+메소드에서 return 값을 주지않으면 젤최근에 다룬 변수를 리턴하는 것같다.(확실x)
+
+----------------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+
+void swap(int arr[],int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+void bubbleSort(int arr[],int begin,int end) {	// begin은 제일 왼쪽 원소 인덱스 , end는 제일 오른쪽 원소 인덱스
+	int pivot;
+	if (begin < end) { // 원소가 하나 이상
+
+		pivot = partition(arr, begin, end);
+		bubbleSort(arr, begin, pivot - 1);
+		bubbleSort(arr, pivot+1, end);
+
+	}
+}
+
+int partition(int arr[], int begin, int end) {
+	int p = begin;	// pivot이 젤앞 원소
+	int L = begin+1, R = end;	// L은 두번째 원소 end는 끝원소
+	while (L<R) {	// 원소가 두개 이상 있어야됨
+		while (arr[L] < arr[p] && L < R) L++;	// L이 p보다 크거나 같은값 찾을때 까지 단, R을 만나면 멈춤
+		while (arr[R] >= arr[p] && R>p)R--;	// R이 p보다 작은 값 찾을 때 까지, pivot 만나면 멈춤
+		if (L < R) {
+			swap(arr, L, R);
+		}
+	}
+	swap(arr, p, R);
+	return R;
+}
+
+main() {
+	int arr[] = { 69,10,30,2,16,8,31,22 };
+	int len = sizeof(arr) / sizeof(int);
+
+	printArr(arr, len);
+	bubbleSort(arr, 0, len-1);
+	puts("");
+	printArr(arr, len);
+}
+
+----------------------------------------------------------------------------------------------------------------------------
+<출력>
+69 10 30 2 16 8 31 22
+
+2 8 10 16 22 31 30 69
