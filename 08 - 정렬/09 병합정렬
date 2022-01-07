@@ -1,0 +1,104 @@
+<배운점>
+
+-병합정렬이란
+//대표적인 '분할정복' 알고리즘
+//하나의 집합을 두개의 부분집합으로 분할 한뒤 각자 정렬하고 나중에 합치는 방식이다.
+
+-병합정렬 구현방식
+// 1. 하나의 큰 집합을 크기가 1인 부분집합이 될때까지 분할한다.
+// 2. 다시 두개씩 짝지어서 결합한다.
+// 3. 결합하면서 두개의 부분집합의 앞원소들끼리 비교하면서 작은 것부터 하나씩 집합에 넣으며 결합한다.
+
+-아쉬운점
+
+------------------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX 8
+
+void swap(int arr[],int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+
+
+void mergeSort(int arr[], int m,int n) {	
+	if (m >= n) {
+		return;
+	}
+	int middle=(m+n)/2;
+	mergeSort(arr,m,middle);
+	mergeSort(arr,middle+1,n);
+	merge(arr,m,middle,n);
+}
+
+
+int merge(int arr[],int m, int middle, int n) {
+	static int cnt = 1;
+	int i = m, j = middle + 1, k = 0;
+	int sorted[MAX]={0};
+	while (i <= middle && j <= n) {	// 한쪽 부분집합이 모두 사라질때까지
+		if (arr[i] < arr[j]) {	// 왼쪽 부분집합의 앞 원소가 더 작을경우
+			sorted[k++] = arr[i++];	// sorted[]에 왼쪽부분집합 앞원소를 넣고 k,i 1증가
+		}
+		else sorted[k++] = arr[j++];	// 더클경우는 더 작은 j를
+	}
+	if (i > middle) {	// 왼쪽 부분집합을 다 비웠을 경우
+		while (j <= n) {	// 오른쪽 부분집합을 sorted에 다 넣어줌
+			sorted[k++] = arr[j++];	// 부분집합 안의 원소들은 이미 정렬되어있기때문에 그냥 순서대로 넣어주면 됨
+		}
+	}
+	else {	// 오른쪽 부분집합을 다 비웠을 경우
+		while (i <= middle) {	// 왼쪽 부분집합을 sorted에 다 넣어줌
+			sorted[k++] = arr[i++];
+		}
+	}
+	for (i = m, k = 0; i <= n; i++) {	// 본래의 집합에 sorted를 넣어줌
+		arr[i] = sorted[k++];
+	}
+	printf("%d 번째 merge() : ", cnt++);
+	printArr(arr, MAX);
+}
+
+
+main() {
+	int random;
+	int arr[MAX];
+	int len = sizeof(arr) / sizeof(int);
+	srand(time(NULL));
+	for (int i = 0; i < len; i++) {
+		random = rand() % 100;
+		arr[i] = random;
+	}
+	printf("정렬할 원소 : ");
+	printArr(arr, len);
+	mergeSort(arr, 0, len - 1);
+	puts("");
+	printArr(arr, len);
+}
+------------------------------------------------------------------------------------------------------------------------------
+<출력>
+정렬할 원소 : 30 34 36 90 87 52 48 9
+1 번째 merge() : 30 34 36 90 87 52 48 9
+2 번째 merge() : 30 34 36 90 87 52 48 9
+3 번째 merge() : 30 34 36 90 87 52 48 9
+4 번째 merge() : 30 34 36 90 52 87 48 9
+5 번째 merge() : 30 34 36 90 52 87 9 48
+6 번째 merge() : 30 34 36 90 9 48 52 87
+7 번째 merge() : 9 30 34 36 48 52 87 90
+
+9 30 34 36 48 52 87 90
