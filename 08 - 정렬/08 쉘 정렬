@@ -1,0 +1,89 @@
+<배운점>
+
+-쉘 정렬이란
+//삽입정렬을 개선한 버전으로, 한집합을 일정한 간격(interval)으로 나누어 
+//여러개의 부분집합을 만들고 부분집합안에서 삽입정렬을 실행한다.
+//interval의 간격을 줄여주어 다시 여러개의 부분집합에서 삽입정렬을 실행한다.
+//interval의 간격을 계속 줄여가며 부분집합이 한개가될때(부분집합의크기==원래집합의크기)까지 실행한다.
+
+-시간복잡도
+최선 : O(N)
+평균 : O(N^1.25)
+최악 : O(N^2)
+
+----------------------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void swap(int arr[],int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+void intervalSort(int arr[], int begin, int end, int interval) {
+	int tmp;
+	int j;
+	for (int i = begin; i <= end; i += interval) {
+		tmp = arr[i];
+		j = i;
+		while (j > begin && arr[j - interval] > tmp) {
+			arr[j] = arr[j - interval];
+			j = j - interval;
+		}
+		arr[j] = tmp;
+	}
+	return;
+}
+
+void shellSort(int arr[], int len) {	
+	int interval = len;
+	int cnt = 1;
+	while (interval >= 1) {
+		interval = interval / 2;
+		for (int i = 0; i < interval; i++) {
+			intervalSort(arr, i, len - 1, interval);
+		}
+		printf("interval = %d 일때 ", interval);
+		printArr(arr, len);
+	}
+}
+
+
+
+main() {
+	int random;
+	int arr[8];
+	int len = sizeof(arr) / sizeof(int);
+	srand(time(NULL));
+	for (int i = 0; i < len; i++) {
+		random = rand() % 100;
+		arr[i] = random;
+	}
+	
+
+	printArr(arr, len);
+	shellSort(arr, len);
+	puts("");
+	printArr(arr, len);
+}
+----------------------------------------------------------------------------------------------------------------------------------
+<출력>
+
+48 32 60 7 26 12 64 77
+interval = 4 일때 26 12 60 7 48 32 64 77
+interval = 2 일때 26 7 48 12 60 32 64 77
+interval = 1 일때 7 12 26 32 48 60 64 77
+interval = 0 일때 7 12 26 32 48 60 64 77
+
+7 12 26 32 48 60 64 77
