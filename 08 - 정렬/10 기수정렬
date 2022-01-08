@@ -43,6 +43,7 @@ void enQueue(Queue* Q, int data) {
 		Q->rear = newnode;
 		return;
 	}
+
 	Q->rear->link = newnode;
 	Q->rear = newnode;
 	return;
@@ -95,18 +96,31 @@ int finddigit(int arr[], int len) {	// 배열 arr변수가 들고있는 숫자�
 
 int radixSort(int arr[], int len) {
 	int digit;
-	int i,j,k;
+	int i,j,k=0;
+	int factor = 1;
 	digit = finddigit(arr, len);	// 몇 자리수까지 있는지 확인
 	Queue* Q[10];
-	for (i = 0; i < 10; i++)Q[i] = (Queue*)malloc(sizeof(Queue));
+	for (i = 0; i < 10; i++)Q[i] = createQueue();
 	for (i = 0; i < digit; i++) {
 		for (j = 0; j < len; j++) {
-			enQueue()
+			enQueue(Q[arr[j] / factor % 10], arr[j]);
 		}
+		k = 0;
+		for (j = 0; j < 10; j++) {
+			while (!isEmpty(Q[j])) {
+				arr[k++] = deQueue(Q[j]);
+			}
+		}
+		factor = factor * 10;	// 1의자리 정렬, 10의자리 정렬, 100의자리 정렬...n의자리정렬
+		printf("%d의자리 정렬 : ", factor / 10);
+		printArr(arr, len);
 	}
 }
 
 main() {
+	int start, end;
+	double result;
+
 	int random;
 	int arr[MAX];
 	int len = sizeof(arr) / sizeof(int);
@@ -115,11 +129,17 @@ main() {
 		random = rand() % 100;
 		arr[i] = random;
 	}
-
 	printf("정렬할 원소 : ");
 	printArr(arr, len);
-	radixSort(arr, len);
 	puts("");
+	radixSort(arr, len);
+	printf("정렬된 원소 : ");
 	printArr(arr, len);
 }
 ------------------------------------------------------------------------------------------------------------------------
+<출력>
+정렬할 원소 : 86 39 79 76 75 86 42 62
+
+1의자리 정렬 : 42 62 75 86 76 86 39 79
+10의자리 정렬 : 39 42 62 75 76 79 86 86
+정렬된 원소 : 39 42 62 75 76 79 86 86
