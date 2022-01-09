@@ -1,1 +1,136 @@
+<배운점>
+
+-힙 정렬이란
+// 힙을 이용한 정렬이다. 
+// 최대힙을 이용하면 배열이 끝자리부터 넣어야되고 최소힙을 이용하면 배열의 첫자리부터 넣으면된다.
+
+-시간복잡도
+최선 : O(NlogN)
+평균 : O(NlogN)
+최악 : O(NlogN)
+
+-히프
+// 저번에 배웠던 힙에대해서 다시한번 구현할수있는 시간이였다.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX 8
+#define HEAP_MAX MAX+1
+
+typedef struct {
+	int heap[HEAP_MAX];
+	int heap_size;
+}heapType;
+
+heapType* createHeap() {
+	heapType* H = (heapType*)malloc(sizeof(heapType));
+	H->heap_size = 0;
+	for (int i = 0; i < HEAP_MAX; i++)H->heap[i] = 0;
+	return H;
+}
+
+void insertHeap(heapType* H, int data) {
+	if (H->heap_size >= HEAP_MAX) {
+		printf("힙이 가득 찼습니다.\n");
+	}
+	H->heap[++H->heap_size] = data;	// 1부터 넣고, heap_size는 마지막 원소의 위치를 가리킴
+	int w = H->heap_size ;
+	while (w > 1 && data>H->heap[w/2]) {
+			H->heap[w] = H->heap[w / 2];
+			w = w / 2;
+	}
+	H->heap[w] = data;
+}
+
+int deletHeap(heapType* H) {
+	int parent, child;
+	int item,temp;
+	int w;
+	temp = H->heap[1];	// return 할 값
+	item = H->heap[H->heap_size--];	// 
+	parent = 1;
+	child = 2;
+	while (child <= H->heap_size){ 
+		if (child < H->heap_size) {
+			if (H->heap[child] < H->heap[child + 1])
+				child++;
+		}
+		if (H->heap[child] > item) {
+			H->heap[parent] = H->heap[child];
+			parent = child;
+			child = parent * 2;
+		}
+		else break;
+	}
+	H->heap[parent] = item;
+	return temp;
+}
+
+void printHeap(heapType* h) {
+	if (h->heap_size == 0) {
+		printf("힙이 비었습니다\n");
+		return;
+	}
+	for (int i = 1; i <= h->heap_size; i++) {
+		printf(" %d ", h->heap[i]);
+	}
+	printf("\n");
+	return;
+}
+
+void swap(int arr[], int i, int j) {
+	int tmp;
+	tmp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = tmp;
+	return;
+}
+
+void printArr(int arr[], int len) {
+	for (int i = 0; i < len; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+void heapSort(int arr[], int len) {
+	heapType* H = createHeap();
+	for (int i = 0; i < len; i++) {
+		insertHeap(H, arr[i]);
+	}
+	for (int i = 0; i < len; i++) {
+		arr[len-i-1] = deletHeap(H);
+	}
+	
+}
+
+main() {
+	int start, end;
+	double result;
+
+	int random;
+	int arr[MAX];
+	int len = sizeof(arr) / sizeof(int);
+	srand(time(NULL));
+	for (int i = 0; i < len; i++) {
+		random = rand() % 100;
+		arr[i] = random;
+	}
+	printf("정렬할 원소 : ");
+	printArr(arr, len);
+	puts("");
+	heapSort(arr, len);
+	printf("정렬된 원소 : ");
+	printArr(arr, len);
+}
+----------------------------------------------------------------------------------------------------------------------------
+<출력>
+정렬할 원소 : 27 17 15 30 93 30 40 6
+
+정렬된 원소 : 6 15 17 27 30 30 40 93
 
