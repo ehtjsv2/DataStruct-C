@@ -1,8 +1,11 @@
 <배운점>
 
+아직 하는 중..(22.01.15
+
 // 공백 연결리스트를 생성
 // 연결리스트 전체 메모리 해제
 // 연결리스트 순서대로 출력
+// 노드를 처음에 삽입
 // 노드를 중간에 삽입
 // 마지막 노드로 삽입
 // 노드 입력 후 노드를 삭제
@@ -10,5 +13,65 @@
 
 -------------------------------------------------------------------------------------------------------------------------------------
 <코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+typedef struct node {
+	char key;
+	struct node* link;
+}node;
+
+typedef struct LinkedList {
+	node* H;
+}LinkedList;
+
+node* createNode(char key) {
+	node* newnode = (node*)malloc(sizeof(node));
+	newnode->key = key;
+	newnode->link = NULL;
+	return newnode;
+}
+
+LinkedList* createList() {
+	LinkedList* List = (LinkedList*)malloc(sizeof(List));
+	List->H = NULL;
+	return List;
+}
+
+int isEmpty(LinkedList* L) {
+	if (L->H == NULL)return 1;
+	else return 0;
+}
+
+node* searchNode(LinkedList* L, char key) {
+	node* p = L->H;
+	do {
+		if (p->key == key) {
+			return p;
+		}
+		else p = p->link;
+	} while (p != L->H);
+	printf("찾는 노드가 없습니다.\n");
+	return NULL;
+}
+
+void printList(LinkedList* L) {
+	node* horse = L->H;
+	if (isEmpty(L))return;
+	do{
+		printf(" %c ->", horse->key);
+		horse = horse->key;
+	} while (horse!=L->H);
+	printf(" 첫노드\n");
+}
+
+void insertFirstNode(LinkedList* L, char key) {
+
+}
+
+
+main() {
+
+}
 -------------------------------------------------------------------------------------------------------------------------------------
