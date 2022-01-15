@@ -1,6 +1,33 @@
 <배운점>
 
-아직 하는 중..(22.01.15
+-메모리구조
+1. 코드 영역
+2. 데이터 영역
+3. 힙 영역
+4. 스택영역
+
+-코드 영역
+말 그대로 코드가 저장되는 영역
+
+-데이터 영역
+프로그램 실행 시에 바로 생성되서 프로세스 끝나면 사라지는 변수들 (ex, 전역변수 정적변수(static))
+
+-힙 영역
+동적할당 된 메모리가 저장되는 곳. free해주어야사라짐(또는 프로세스 종료시)
+int *p=(int*)malloc(sizeof(int)*10);
+이라는 코드가 있으면 
+포인터 p는 데이터영역 또는 스택영역
+p가 가르키는 int형변수 10개는 힙영역에 저장된다.
+
+
+-스택 영역
+지역변수와 매개변수가 저장되는 곳 함수 종료시에 사라짐
+
+-------------------------------------------------------------------------------------------------------------------------------------
+<코드>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // 공백 연결리스트를 생성
 // 연결리스트 전체 메모리 해제
@@ -9,13 +36,7 @@
 // 노드를 중간에 삽입
 // 마지막 노드로 삽입
 // 노드 입력 후 노드를 삭제
-// 노드를 탐색 후 노드 리턴
-
--------------------------------------------------------------------------------------------------------------------------------------
-<코드>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// 노드를 탐색 후 노드주소 리턴
 
 typedef struct node {
 	char key;
@@ -61,17 +82,118 @@ void printList(LinkedList* L) {
 	if (isEmpty(L))return;
 	do{
 		printf(" %c ->", horse->key);
-		horse = horse->key;
+		horse = horse->link;
 	} while (horse!=L->H);
-	printf(" 첫노드\n");
+	printf(" 첫노드 %c\n",horse->key);
+}
+
+node* findLastNode(LinkedList* L) {
+	if (isEmpty(L)) {
+		return NULL;
+	}
+	node* p = L->H;
+	do
+	{
+		p = p->link;
+	} while (p->link!=L->H);
+	return p;
 }
 
 void insertFirstNode(LinkedList* L, char key) {
-
+	node* newnode = createNode(key);
+	if (isEmpty(L)) {
+		L->H = newnode;
+		newnode->link = newnode;
+		return;
+	}
+	node* p = findLastNode(L);
+	newnode->link = L->H;
+	L->H = newnode;
+	p->link = newnode;
+	return;
 }
 
+void insertMiddleNode(LinkedList* L, char pre, char key) {
+	node* prelink = searchNode(L,pre);
+	if (prelink == NULL) {
+		printf("pre값이 존재하지않습니다.\n");
+		return;
+	}
+	node* newnode = createNode(key);
+	newnode->link = prelink->link;
+	prelink->link = newnode;
+	return;
+}
+
+void insertLastNode(LinkedList* L, char key) {
+	node* newnode = createNode(key);
+	if (isEmpty(L)) {
+		L->H = newnode;
+		newnode->link = newnode;
+		return;
+	}
+	node* p = findLastNode(L);
+	newnode->link = p->link;
+	p->link = newnode;
+	return;
+}
+
+void deleteNode(LinkedList* L, char key) {
+	node* p;
+	node* tmp;
+	if (L->H->key == key) {
+		p = findLastNode(L);
+		tmp = L->H;
+		L->H = L->H->link;
+		p->link = L->H;
+		free(tmp);
+		return;
+	}
+	p = L->H;
+	while (p->link->key != key) {
+		p = p->link;
+	}
+	tmp = p->link;
+	p->link = p->link->link;
+	free(tmp);
+	return;
+}
+
+void freeList(LinkedList* L) {
+	node* p = L->H;
+	node* q = findLastNode(L);
+	node* tmp = NULL;
+	while (p != q) {
+		tmp = p;
+		p = p->link;
+		free(tmp);
+	}
+	free(p);
+	free(L);
+	return;
+}
 
 main() {
-
+	LinkedList* L1 = createList();
+	insertLastNode(L1, 70);
+	printList(L1);
+	insertFirstNode(L1, 67);
+	printList(L1);
+	insertFirstNode(L1, 66);
+	printList(L1);
+	insertFirstNode(L1, 65);
+	printList(L1);
+	insertMiddleNode(L1, 67, 68);
+	printList(L1);
+	insertLastNode(L1, 71);
+	printList(L1);
+	deleteNode(L1, 65);
+	printList(L1);
+	deleteNode(L1, 71);
+	printList(L1);
+	deleteNode(L1, 67);
+	printList(L1);
+	freeList(L1);
+	printList(L1);
 }
 -------------------------------------------------------------------------------------------------------------------------------------
