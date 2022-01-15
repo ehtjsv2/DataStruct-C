@@ -1,1 +1,53 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SIZE 10
+
+typedef struct Stack {
+	char arr[SIZE];
+	int top;
+}STACK;
+
+
+STACK* createStack() {
+	STACK* S = (STACK*)malloc(sizeof(STACK));
+	S->top = -1;
+	for (int i = 0; i < SIZE; i++) {
+		S->arr[i] = 0;;
+	}
+	return S;
+}
+
+void push(STACK* S, char data) {
+	if (S->top >= SIZE - 1) {
+		printf("스택이 가득\n");
+		return;
+	}
+	S->arr[++S->top] = data;
+	return;
+}
+
+int pop(STACK* S) {
+	if (S->top < 0) {
+		printf("스택이 텅\n");
+		return;
+	}
+	return S->arr[S->top--];
+}
+
+main() {
+	STACK* S = createStack();
+	char string[10];
+	printf("문자열을 입력하십시오 : ");
+	gets(string);
+	printf("입력한 문자열 : %s\n", string);
+	for (int i = 0; string[i] != '\0'; i++) {
+		push(S, string[i]);
+	}
+	printf("문자열 역순 : ");
+	for (int i = 0; string[i] != '\0'; i++) {
+		printf("%c", pop(S));
+	}
+}
