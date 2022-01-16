@@ -1,0 +1,124 @@
+<배운점>
+
+-삭제시
+1. 자식노드가 없을 때, 하나있을 때 루트노드일 경우를 대비할 것.
+2. 자식노드가 두개일 때 
+그냥 key값 자체를 바꿔버릴 것
+삭제할 노드 주소와, parent,chlid 총 3개 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node{
+	int key;
+	struct node* llink;
+	struct node* rlink;
+}node;
+
+typedef struct treeType {
+	node* root;
+}treeType;
+
+treeType* createBinaryTree() {
+	treeType* T = (treeType*)malloc(sizeof(treeType));
+	T->root = NULL;
+	return T;
+}
+
+node* createNode(int key) {
+	node* newnode = (node*)malloc(sizeof(node));
+	newnode->key = key;
+	newnode->llink = NULL;
+	newnode->rlink = NULL;
+	return newnode;
+}
+
+void insertKey(treeType* BT, int key) {
+	node* parent = BT->root;
+	node* newnode = createNode(key);
+	while (1) {
+		if (key < parent->key) {
+			if (parent->llink == NULL) {
+				parent->llink = newnode;
+				return;
+			}
+			else parent = parent->llink;
+		}
+		else {
+			if (parent->rlink == NULL) {
+				parent->rlink = newnode;
+				return;
+			}
+			else parent = parent->rlink;
+		}
+	}
+}
+
+node* searchKey(node* root, int key) {
+	node* horse = root;
+	int cnt = 1;
+	while (horse != NULL&& horse->key != key) {
+		if (key < horse->key)horse = horse->llink;
+		else horse = horse->rlink;
+		cnt++;
+	}
+	//if (horse->key == key)printf("키값 %d 를 %d번 탐색 후 찾았습니다.\n", horse->key, cnt);
+	return horse;
+}
+
+void inorder(node* root) {
+	if (root != NULL) {
+		inorder(root->llink);
+		printf("%d ", root->key);
+		inorder(root->rlink);
+	}
+	return;
+}
+
+node* searchParent(node* root, int key) {
+	if (root->key == key)return NULL;
+	node* parent=root;
+	node* p = parent;
+	while (p != NULL && p->key != key) {
+		parent = p;
+		if (key < p->key)p = p->llink;
+		else p = p->rlink;
+	}
+	return parent;
+}
+
+void deleteKey(node* root, int key) {
+	node* parent = searchParent(root, key);
+	node* child = NULL;
+	node* p = searchKey(root, key);
+	if (p->llink == NULL && p->rlink == NULL) {
+		if (parent == NULL)root = NULL;
+		else {
+			if (parent->llink == p)parent->llink = NULL;
+			else parent->rlink = NULL;
+		}
+	}
+	else if (p->llink == NULL || p->rlink == NULL) {
+		if (p->llink != NULL)child = p->llink;
+		else child = p->rlink;
+		if (parent == NULL)root = child;
+		else if (parent->llink = p)parent->llink = child;
+		else parent->rlink = child;
+	}
+	else {
+		parent = p;
+		child = parent->rlink;
+		while (child->llink != NULL) {
+			parent = child;
+			child = child->llink;
+		}
+		p->key = child->key;
+		if (p == parent)p->rlink = NULL;
+		else parent->llink = child->rlink;
+		p = child;	// 밑의 free()하기위해
+	}
+	free(p);
+	root;
+	return;
+}
